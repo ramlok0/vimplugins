@@ -275,8 +275,17 @@ augroup QFixToggle
  autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | endif
 augroup END
 
-
-
+let g:ycm_key_list_select_completion = ['<Down>']
+let g:ycm_key_list_previous_completion=['<Up>']
+"ultisnip config
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger="<tab>"
+noremap <C-i> :call UltiSnips#ExpandSnippet(<CR>
+" close preview window after user leaves insert mode
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_autoclose_preview_window_after_completion = 0
+let g:UltiSnipsJumpForwardTrigger = "<Right>"
+let g:UltiSnipsJumpBackwardTrigger = "<Left>"
 
 if has("gui_running")
   set lines=999 columns=999
