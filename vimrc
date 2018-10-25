@@ -8,7 +8,6 @@ filetype plugin on
 execute pathogen#infect()
 
 let g:quickr_cscope_autoload_db = 0
-
 "allows Highlight plugin to save conf
 "set viminfo^=!
 " % - restores buffers between sessions
@@ -38,6 +37,14 @@ set showmode
 set backup
 "mkdir ~/.vim/.backup ~/.vim/.swp ~/.vim/.undo
 
+"settings for sessions
+set ssop-=options    " do not store global and local values in a session
+set ssop-=folds      " do not store folds"
+let g:session_directory = "~/.vim/tmp/session"  " the directory must be created before the sessions will be saved there
+let g:session_autoload = "no"                   " automatic reload sessions
+let g:session_autosave = "no"                   " autosave
+let g:session_command_aliases = 1
+
 let g:gundo_prefer_python3=1
 
 set backupdir=~/.vim/.backup/
@@ -55,7 +62,6 @@ exe "cs add " . "/home/km000057/GIT/mainline/vobs/cscope.files" . " " . " "
 " exe "cscope add /home/km000057/phones_GIT/vobs/cscope.files"
 let g:ycm_min_num_of_chars_for_completion = 2
 let g:ycm_auto_trigger = 1
-let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
 let g:ycm_complete_in_comments = 1 " Completion in comments
@@ -66,8 +72,6 @@ let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/.ycm_extra_conf.py'
 " turn off syntax checking
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_confirm_extra_conf = 0
-let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_autoclose_preview_window_after_completion = 1
 
 "turn off YMC 
 "nnoremap <leader>y :let g:ycm_auto_trigger=0<CR>                " turn off YCM
@@ -160,7 +164,10 @@ nmap <F7> :QFix<CR>
 nmap <F5> :FSSplitLeft<CR>
 nmap <F4> :AirlineToggleWhitespace<CR>
 nmap <F1> :AsyncRun buildPartial.sh mainline 34 sip 1 %:p:h<CR>5copen<CR>
-nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
+":AsyncRun buildParse.sh mainline 34 sip 1
+
+nmap <F2> :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>5copen<CR>
+"nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
 nmap <F9> :MundoToggle<CR>
 "nmap <F9> :match Error /\s\+$/<CR>
 nmap <F6> :NERDTreeToggle<CR>
@@ -175,11 +182,14 @@ vmap <C-Down> ]egv
 "nnoremap <silent> ,cc :call ToggleComment()<CR>
 "vnoremap <silent> ,cu :call ToggleComment()<CR>
 noremap <silent> ,cc :call ToggleComment()<CR>
+noremap <silent> ,cx :call DoToggleComment()<CR>
+noremap <silent> ,cv :call UnToggleComment()<CR>
 "     noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
 "     noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
 
 " pre enter search and replace string
 nnoremap <C-k> :call SearchAndReplace()<CR>
+vnoremap <C-k> :call SearchAndReplacev()<CR>
  augroup syntax_hghl
   autocmd Syntax * syn match Error /\s\+$/
   autocmd Syntax * syn match TabWhitespace /[\t]/
@@ -280,18 +290,18 @@ augroup QFixToggle
  autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | endif
 augroup END
 
-let g:ycm_key_list_select_completion = ['<Down>']
+let g:ycm_key_list_select_completion = ['<TAB>','<Down>']
 let g:ycm_key_list_previous_completion=['<Up>']
 "ultisnip config
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-noremap <C-i> :call UltiSnips#ExpandSnippet(<CR>
+let g:UltiSnipsExpandTrigger="<c-tab>"
+"noremap <C-i> :call UltiSnips#ExpandSnippet(<CR>
 " close preview window after user leaves insert mode
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 0
 let g:UltiSnipsJumpForwardTrigger = "<Right>"
 let g:UltiSnipsJumpBackwardTrigger = "<Left>"
-
+let g:UltiSnipsListSnippets = "<c-t>"
 if has("gui_running")
   set lines=999 columns=999
 endif
@@ -359,3 +369,5 @@ endif
 "     noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
 "     noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
 " augroup END
+" run macro on each line
+" :'<,'>normal @q

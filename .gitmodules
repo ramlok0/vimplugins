@@ -79,3 +79,6 @@
 [submodule "vim-snippets"]
 	path = vim-snippets
 	url = https://github.com/honza/vim-snippets.git
+[submodule "YCM-Generator"]
+	path = YCM-Generator
+	url = https://github.com/rdnetto/YCM-Generator.git
