@@ -23,8 +23,9 @@ let g:rainbow_active = 1
 "colorscheme desert
 colorscheme molokai
 " fix molokai cursor disapearing on matching parenthesis
-"hi MatchParen      ctermfg=cyan ctermbg=208 cterm=bold
-hi MatchParen      ctermfg=208 ctermbg=233 cterm=bold
+"beforehi MatchParen      ctermfg=cyan ctermbg=208 cterm=bold
+"fixhi MatchParen      ctermfg=208 ctermbg=233 cterm=bold
+"needs to be at the end of file to take effect
 
 syntax on
 
@@ -72,6 +73,10 @@ let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/.ycm_extra_conf.py'
 " turn off syntax checking
 let g:ycm_show_diagnostics_ui = 0
 let g:ycm_confirm_extra_conf = 0
+let g:ycm_key_list_select_completion = ['<TAB>','<Down>']
+let g:ycm_key_list_previous_completion=['<Up>']
+let g:ycm_autoclose_preview_window_after_insertion = 1
+let g:ycm_autoclose_preview_window_after_completion = 0
 
 "turn off YMC 
 "nnoremap <leader>y :let g:ycm_auto_trigger=0<CR>                " turn off YCM
@@ -80,6 +85,10 @@ let g:ycm_confirm_extra_conf = 0
 "" SNIPETS
 nnoremap ,hfor :-1read $HOME/.vim/bundle/after/snippets/for.txt<CR>f(a
 
+
+" clever f config
+let g:clever_f_smart_case = 1
+let g:clever_f_show_prompt = 1
 
 set backspace=indent,eol,start
 
@@ -114,7 +123,7 @@ endif
 
 set wildmode=longest,list,full
 set wildmenu
-set path+=/home/km000057/doc/**,/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/**,/home/km000057/GIT/mainline/vobs/Opera_Platform_Linux/GPAL/GPALMedia/**,/home/km000057/_DWE_/**,**
+set path+=/home/km000057/doc/**,/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/**,/home/km000057/GIT/mainline/vobs/Opera_Platform_Linux/GPAL/GPALMedia/**,/home/km000057/_DWE_/**,/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/Interface/**,/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/VoiceEngine/**,**
 
 set scrolloff=4
 set hidden
@@ -146,12 +155,16 @@ noremap <C-o> :YRReplace 1 p<CR>
 nnoremap ,p :YRPop<CR>
 "map your keys
 "noremap <C-a> :CtrlP /home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/<CR>
-noremap <C-z> :CtrlPBuffer<CR>
-noremap <C-x> :CtrlPMRUFiles<CR>
+" noremap <C-z> :CtrlPBuffer<CR>
+noremap <C-z> :Buffers<CR>
+" noremap <C-x> :CtrlPMRUFiles<CR>
+noremap <C-x> :FZFMru<CR>
 "noremap <C-h> :CtrlPBookmarkDir<CR>
 "noremap <C-j> :call DmenuOpen("Files")<CR>
-noremap <C-h> :call GetGitFolder("$HOME/GIT/")<CR>
-noremap <C-j> :call GetLastGitFiles()<CR>
+" noremap <C-h> :call GetGitFolder("$HOME/GIT/")<CR>
+noremap <C-h> :call BrowseFolder("$HOME/GIT/")<CR>
+noremap <C-j> :call BrowseFolder(g:lastSearch)<CR>
+" noremap <C-j> :call GetLastGitFiles()<CR>
 let g:traceText = "OPERA_ERROR"
 noremap <C-l> :call InsertMethodTrace()<CR>
 " noremap <C-f> :Files ~/phones_GIT/vobs/<CR>
@@ -184,6 +197,13 @@ vmap <C-Down> ]egv
 noremap <silent> ,cc :call ToggleComment()<CR>
 noremap <silent> ,cx :call DoToggleComment()<CR>
 noremap <silent> ,cv :call UnToggleComment()<CR>
+" :c-r c-w = paste
+noremap <silent> ,bg :call BufferGrep()<CR>
+noremap <silent> ,br :call BufferReplace()<CR>
+noremap <silent> ,bb :call CtrlSF<CR>
+noremap <silent> ,fr :call FolderReplace()<CR>
+noremap <silent> ,fg :call FolderGrep()<CR>
+noremap <silent> ,ff :call FolderReplaceIn()<CR>
 "     noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
 "     noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
 
@@ -290,15 +310,11 @@ augroup QFixToggle
  autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | endif
 augroup END
 
-let g:ycm_key_list_select_completion = ['<TAB>','<Down>']
-let g:ycm_key_list_previous_completion=['<Up>']
 "ultisnip config
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<c-tab>"
 "noremap <C-i> :call UltiSnips#ExpandSnippet(<CR>
 " close preview window after user leaves insert mode
-let g:ycm_autoclose_preview_window_after_insertion = 1
-let g:ycm_autoclose_preview_window_after_completion = 0
 let g:UltiSnipsJumpForwardTrigger = "<Right>"
 let g:UltiSnipsJumpBackwardTrigger = "<Left>"
 let g:UltiSnipsListSnippets = "<c-t>"
@@ -371,3 +387,15 @@ endif
 " augroup END
 " run macro on each line
 " :'<,'>normal @q
+" function! SessionName(...)
+    " return g:session_name
+" endfunction
+" 
+ " call airline#add_statusline_func('SessionName')
+ " call airline#add_inactive_statusline_func('SessionName')
+" 
+" call airline#parts#define_function('session_name', 'SessionName')
+" let g:airline_section_x = airline#section#create(['session_name'])
+" fix molokai cursor disapearing on matching parenthesis
+"hi MatchParen      ctermfg=cyan ctermbg=208 cterm=bold
+hi MatchParen      ctermfg=208 ctermbg=233 cterm=bold

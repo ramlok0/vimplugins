@@ -69,15 +69,15 @@ function! TraceShowSipWith(expr)
 
     setl foldminlines=0
     setl foldlevel=0
-    set foldclose=all
+    set  foldclose=all
     setl foldtext=""
-    set fillchars=""
+    set  fillchars=""
     call TraceHighlightSIP()
 endfunction
 
 
 function! TraceOnlySip()
-  echom "Test"
+    echom "Test"
     setl foldmethod=expr
     setlocal foldexpr=(((getline(v:lnum)=~':\\(.\\)\\1\\{2\\}.*$')\|\|(getline(v:lnum)=~'^$')\|\|(getline(v:lnum)=~'(\\d\\{3,5}):')\|\|(getline(v:lnum)=~'^\\s'))\&\&((getline(v:lnum)!~'SIP.Messages')\&\&(getline(v:lnum+1)!~'SIP.Messages')\&\&(getline(v:lnum)!~'Packet.[IO]')\&\&(getline(v:lnum)!~'error\\\|warning\\\|invalid\\\|fail')\&\&(getline(v:lnum-1)!~'error\\\|warning\\\|invalid\\\|fail')))?1:0 foldmethod=expr
     setl foldminlines=0
@@ -287,29 +287,29 @@ function! Tab_Or_Complete()
     else
         return "\<Tab>"
     endif
-  endfunction
+endfunction
 
   "https://devhints.io/vimscript-functions
   "
   "
   "execute with DmenuOpen("Files") to ge folder, select from gits
   "" Strip the newline from the end of a string
-function! Chomp(str)
-  return substitute(a:str, '\n$', '', '')
-endfunction
-
-" Find a file and pass it to cmd
-function! DmenuOpen(cmd)
-  let curDir = getcwd()
-  echo curDir
-  let gitDir = Chomp(system("echo -e \"mainline\nmain2\nv3r5\" | dmenu -i -l 20 -p " . a:cmd))
-  let fname = Chomp(system("ls -d -1 $HOME/GIT/" . gitDir . "/vobs/*/ | dmenu -i -l 20 -p " . a:cmd))
-  if empty(fname)
-    return
-  endif
-  execute a:cmd . " " . fname
-endfunction
-
+" function! Chomp(str)
+  " return substitute(a:str, '\n$', '', '')
+" endfunction
+" 
+" " Find a file and pass it to cmd
+" function! DmenuOpen(cmd)
+  " let curDir = getcwd()
+  " echo curDir
+  " let gitDir = Chomp(system("echo -e \"mainline\nmain2\nv3r5\" | dmenu -i -l 20 -p " . a:cmd))
+  " let fname = Chomp(system("ls -d -1 $HOME/GIT/" . gitDir . "/vobs/*/ | dmenu -i -l 20 -p " . a:cmd))
+  " if empty(fname)
+    " return
+  " endif
+  " execute a:cmd . " " . fname
+" endfunction
+" 
 
 ""
 "" open folder with different repos
@@ -340,6 +340,52 @@ function! GetGitFiles(expr)
   let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . a:expr
   call fzf#run({ 'source': command, 'sink':   'e' })
 "    execute "CtrlP" a:expr
+endfunction
+
+
+function! GetJustFolders(expr)
+  echom a:expr
+  echom "xx - GetGitSubFolder"
+  echom a:expr
+  call fzf#run({'source': 'ls -1 -d ' . a:expr . "/vobs/*/", 'sink': function('GetGitFiles')})
+"  Files a:expr<cr>
+endfunction
+
+let g:lastSearch=""
+function! BrowseFolder(expr)
+  let a:search=a:expr
+  echom "search for "a:search
+  if empty(a:search)
+    let a:search="$HOME"
+  endif
+  let a:previousSearch=a:search
+  while 1
+    echom "search for "a:search
+    let a:dirs = system("ls -1 -d " . a:search . '/*/')
+    " let a:dirs=split(a:dirs)
+    " if len(a:dirs) == 1 " auto open single folder directory
+      " let a:search=join(a:dirs)
+      " echom "just one "a:search
+      " continue
+    " endif
+    " let a:search = fzf#run({'source': 'ls -1 -d ' . a:search . '/*/', 'sink*': function('GetOutput'), 'options': '--expect=ctrl-x'})
+    let a:search = fzf#run({'source': 'ls -1 -d ' . a:search . '/*/', 'options': '--expect=ctrl-x'})
+    if !empty(a:search)
+      if a:search[0] == "ctrl-x"
+        let a:search=fnamemodify(a:previousSearch,':h')
+        let a:search=fnamemodify(a:search,':h')
+        let a:previousSearch=a:search
+        continue
+      endif
+      let a:previousSearch=a:search[1]
+      let a:search=a:previousSearch
+      continue
+    endif
+    break
+  endwhile
+  let g:lastSearch=a:previousSearch
+  let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . a:previousSearch
+  call fzf#run({ 'source': command, 'sink':   'e' })
 endfunction
 
 
@@ -397,7 +443,7 @@ function! SearchAndReplacev() range
         " echom join(getpos("'<"))
         " echom join(getpos("'>"))
     end
-    " getpos gets extra param for end '> if line is too short, 
+    " getpos gets extra param for end '> if line is too short,
     " if highlight goes from back to from column start end need to be switched
     if column_extra != 0
       let l:colsum=column_end+column_extra
@@ -479,7 +525,7 @@ function! ToggleComment()
    " else
    "     echo "No comment leader found for filetype"
    " endif
-  endfunction
+endfunction
 
 function! UnToggleComment()
       if has_key(s:comment_map, &filetype)
@@ -488,7 +534,7 @@ function! UnToggleComment()
         let comment_leader = "#"
       endif
       execute 'silent s/\v\s*\zs' . comment_leader . '\s*\ze//e'
-  endfunction
+endfunction
 
 function! DoToggleComment()
       if has_key(s:comment_map, &filetype)
@@ -498,7 +544,7 @@ function! DoToggleComment()
       endif
       " comment the line
       execute 'silent s/\v^(\s*)/\1' . comment_leader . ' /'
-  endfunction
+endfunction
 
   " \w toggle wrap mode remap keys to go up/down by screen line not enter-end
   " line
@@ -507,7 +553,7 @@ noremap  <buffer> <silent> j gj
 noremap  <buffer> <silent> 0 g0
 noremap  <buffer> <silent> $ g$
 noremap <silent> <Leader>w :call ToggleWrap()<CR>
-function ToggleWrap()
+function! ToggleWrap()
   if &wrap
     echo "Wrap OFF"
     setlocal nowrap
@@ -587,14 +633,14 @@ function! VisualSelection()
     echom join(lines,"\n")
     return l:test
     " return join(lines, "\n")
-  endfunction
+endfunction
 
 
 " managing sessions
 " Creates a session
 let g:session_name=""
-function! MakeSession(name)
-  let b:sessiondir = $HOME . "/.vim/sessions/" 
+function! SaveSession(name)
+  let b:sessiondir = $HOME . "/.vim/sessions/"
   if (filewritable(b:sessiondir) != 2)
     exe 'silent !mkdir -p ' b:sessiondir
     redraw!
@@ -605,15 +651,20 @@ function! MakeSession(name)
   else
     let b:sessionfile = b:sessiondir . a:name
     let g:session_name = a:name
-  endif 
+  endif
   echom b:sessionfile
   exe "mksession! " . b:sessionfile
 endfunction
 
 " Updates a session, BUT ONLY IF IT ALREADY EXISTS
+" (bufnr("$") == 1) nr of last buffer
 function! UpdateSession()
+  " echom bufnr("$")
   if empty(g:session_name)
     echom "No update - session not set"
+    return
+  elseif (len(getbufinfo({'buflisted':1})) == 1)
+    echom "No opened buffers"
     return
   endif
   let b:sessiondir = $HOME . "/.vim/sessions/"
@@ -628,13 +679,30 @@ endfunction
 
 " Loads a session if it exists
 function! LoadSession(filename)
-  let b:sessiondir = $HOME . "/.vim/sessions/"
+  if !empty(g:session_name)
+    echom "Do you want to close previous session?i (y/n)"
+    while 1
+      " let choice = inputlist(['1. yes','2. no'])
+      let choice = nr2char(getchar())
+      if tolower(choice) != "y" && tolower(choice) != "n"
+        " redraw!
+        continue
+      elseif tolower(choice) == "y"
+        exe 'call UpdateSession()'
+        exe '%bd'
+        break
+      else
+        break
+      endif
+    endwhile
+  endif
   if empty(a:filename)
     let g:session_name = "session.vim"
   else
     let g:session_name = a:filename
   endif
-  let b:sessionfile = b:sessiondir .g:session_name 
+  let b:sessiondir = $HOME . "/.vim/sessions/"
+  let b:sessionfile = b:sessiondir . g:session_name
   if (filereadable(b:sessionfile))
     exe 'source ' b:sessionfile
   else
@@ -643,7 +711,9 @@ function! LoadSession(filename)
   endif
 endfunction
 
-au VimLeave * :call UpdateSession()
+augroup exitGr
+  au VimLeave * :call UpdateSession()
+augroup END
 
 
 
@@ -654,4 +724,63 @@ endfunction
 
 " command! -nargs=1 -complete=customlist,MyComp LoadSession call MyFunc(<f-args>)
 command! -nargs=1 -complete=customlist,SessionsCompletion LoadSession call LoadSession(<f-args>)
-command! -nargs=1 -complete=customlist,SessionsCompletion SaveSession call MakeSession(<f-args>)
+command! -nargs=1 -complete=customlist,SessionsCompletion SaveSession call SaveSession(<f-args>)
+
+
+function! SessionName(...)
+     return g:session_name
+endfunction
+call airline#parts#define_function('session_name', 'SessionName')
+call airline#parts#define_accent('session_name', 'blue')
+" let g:airline_section_x = airline#section#create_right(['tagbar', 'gutentags', 'grepper','filetype','session_name'])
+let g:airline_section_x = airline#section#create_right(['tagbar', 'gutentags', 'grepper','session_name'])
+
+
+function! BufferGrep()
+  let currBuff=bufnr("%")
+  execute ":cexpr []"
+  let l:currentWord = expand("<cword>")
+  execute "bufdo vimgrepadd! /" . l:currentWord . "/j %"
+  execute 'buffer ' . currBuff
+  echom "done"
+endfunction
+
+function! BufferReplace()
+  let currBuff=bufnr("%")
+  let l:currentWord = expand("<cword>")
+  "bufdo %s/" . l:currentWord . "//gec"
+  call feedkeys(":bufdo %s/" . l:currentWord . "//gec","t")
+  execute 'buffer ' . currBuff
+endfunction
+" bufdo %s/word//gec | update
+" bufdo %s/test/chichi/gec
+"
+"" fill guickfix with files and run search and replace on them
+function! FolderGrep()
+  let currBuff=bufnr("%")
+  let l:currentWord = expand("<cword>")
+  call feedkeys(":vimgrepadd /" . l:currentWord . "/j *","t")
+endfunction
+
+" replace in quickfix window
+function! FolderReplace()
+  let currBuff=bufnr("%")
+  let l:currentWord = expand("<cword>")
+  call feedkeys(":cfdo %s/" . l:currentWord . "//gc","t")
+endfunction
+" cxc cancel, cxx line cxiw inner word, X in visual mode
+"
+"fill quick fix and replace
+function! FolderReplaceIn()
+  let currBuff=bufnr("%")
+  let l:currentWord = expand("<cword>")
+  let cmd = input("","vimgrepadd /" . l:currentWord . "/j *")
+  exe cmd
+  let cmd = input("","cfdo %s/" . l:currentWord . "//gc")
+  exe cmd
+endfunction
+
+function! Test()
+  let cmd = input("", "call FileTypeToggle(\"\")\<left>\<left>")
+  exe cmd
+endfunction

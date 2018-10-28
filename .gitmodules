@@ -82,3 +82,30 @@
 [submodule "YCM-Generator"]
 	path = YCM-Generator
 	url = https://github.com/rdnetto/YCM-Generator.git
+[submodule "targets.vim"]
+	path = targets.vim
+	url = https://github.com/wellle/targets.vim.git
+[submodule "vim-easy-align"]
+	path = vim-easy-align
+	url = https://github.com/junegunn/vim-easy-align.git
+[submodule "clever-f.vim"]
+	path = clever-f.vim
+	url = https://github.com/rhysd/clever-f.vim.git
+[submodule "vim-surround"]
+	path = vim-surround
+	url = https://github.com/tpope/vim-surround.git
+[submodule "vim-matchit"]
+	path = vim-matchit
+	url = https://github.com/adelarsq/vim-matchit.git
+[submodule "fzf-mru.vim"]
+	path = fzf-mru.vim
+	url = https://github.com/pbogut/fzf-mru.vim.git
+[submodule "LeaderF"]
+	path = LeaderF
+	url = https://github.com/Yggdroot/LeaderF.git
+[submodule "ctrlsf.vim"]
+	path = ctrlsf.vim
+	url = https://github.com/dyng/ctrlsf.vim.git
+[submodule "far.vim"]
+	path = far.vim
+	url = https://github.com/brooth/far.vim.git

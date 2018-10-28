@@ -92,6 +92,118 @@ def FlagsForFile( filename ):
     '-l', 'pthread'
   ] }
 
+
+CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
+
+include_dirs = [
+    '/home/km000057/GIT/mainline/vobs/Opera_Framework/Interfaces',
+    '/home/km000057/GIT/mainline/vobs/Opera_Platform_Linux/GPAL/GPALMedia/Interface',
+    '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/blued/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/blued/GPAL/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/Interface',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/VoiceEngine/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/BluetoothService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/Common/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/ToneGenerationService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/MediaControlService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/SRTP/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/MediaProcessingService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Interfaces',
+    '/home/km000057/GIT/mainline/vobs/Opera_Platform_Linux/Interfaces',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/TestJournalService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/Common/CanonicalDialSettings/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFAAdaptor/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/SIP/Common/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/SIP/CallControl/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/SIP/FunctionalInterface/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/SIP/TeamServices/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/SIP/Signalling/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/Common/XmlSaxParser/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/Common/InterfaceProxy/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/Common/MessageExtender/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/Common/Mapper/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/Common/Kicker/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/Common/sosal/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/DisplayHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/AudioHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/CallControl/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/LocalFeatureHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/CallLogHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/FeatureHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/HFA/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/ConfigManager/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/MenuHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/CTCHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/DeviceHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/HFA/CCHandler/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CommunicationsService/Adaptor/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/AnsibleService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CSTAParser/xmlelement/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CSTAParser/cstaXML/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CSTATestService/SIP/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/OBEXService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/WSIService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/AnalyticsService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/DigitAnalysisService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/InstrumentationService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/JournalService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/EAS/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/DirectoryService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/BroadsoftService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/SidecarService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/LDAPService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CSTA_Service/CSTAComputingFunction/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/CSTA_Service/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/UCService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/PotService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/BackupService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/TeamService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/EWS/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Business_Services/MediaRecordingService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/MediaProcessingService/include',
+    '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TFramework/Sources/',
+    '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TConfig/SIP/'
+    '/home/km000057/GIT/mainline/vobs/Opera_Platform_Linux/Linux_BSP/ifx-com-linux/source/user/opensource/openssl/output/armv7l_R3/usr/include/',
+    '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TIce/Sources/IceManagement/',
+    '/home/km000057/GIT/mainline/vobs/Opera_Platform_Linux/GPAL/Devices/include/',
+    '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/VideoService/include/',
+    '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TConfig/',
+    '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TStun/Sources/',
+    '/usr/include/x86_64-linux-gnu/c++/7',
+    '/usr/include/c++/7'
+]
+
+
+include_files = [
+    './include/linux/kconfig.h',
+]
+
+flags = [
+    '-Wall',
+    '-Wextra',
+    '-Werror',
+    '-ferror-limit=10000',
+    '-std=c++98',
+    '-xc',
+    '-xc++',
+    '-nostdinc',
+]
+
+def FlagsForFileoo( filename, **kwargs ):
+    """
+    Given a source file, retrieves the flags necessary for compiling it.
+    """
+    for dir in include_dirs:
+        flags.append('-I' + os.path.join(CURRENT_DIR, dir))
+
+    for file in include_files:
+        flags.append('-include' + os.path.join(CURRENT_DIR, file))
+
+    return { 'flags': flags }
+
+
+
+
 BASE_FLAGS = [
     '-Wall',
     '-Wextra',
