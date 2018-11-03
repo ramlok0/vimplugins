@@ -11,6 +11,9 @@ python3 install.py --clang-completer --system-libclang
 
 sudo dpkg -i fd.....deb
 
+ignore tags and changes in submodules
+git config -f .gitmodules submodule.YankRing.vim.ignore untracked
+
 
 let g:ycm_global_ycm_extra_conf = 'path to .ycm_extra_conf.py'
 
