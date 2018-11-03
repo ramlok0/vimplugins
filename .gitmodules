@@ -109,3 +109,12 @@
 [submodule "far.vim"]
 	path = far.vim
 	url = https://github.com/brooth/far.vim.git
+[submodule "vim-dirdiff"]
+	path = vim-dirdiff
+	url = https://github.com/will133/vim-dirdiff.git
+[submodule "errormarker.vim"]
+	path = errormarker.vim
+	url = https://github.com/mh21/errormarker.vim.git
+[submodule "ferret"]
+	path = ferret
+	url = https://github.com/wincent/ferret.git

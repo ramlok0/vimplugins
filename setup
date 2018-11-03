@@ -9,6 +9,8 @@ cd YouCompleteMe
 sudo apt-get install cmake
 python3 install.py --clang-completer --system-libclang
 
+sudo dpkg -i fd.....deb
+
 
 let g:ycm_global_ycm_extra_conf = 'path to .ycm_extra_conf.py'
 

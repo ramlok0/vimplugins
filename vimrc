@@ -48,6 +48,9 @@ let g:session_command_aliases = 1
 
 let g:gundo_prefer_python3=1
 
+let g:DirDiffIgnore=".git,*.d,*.o"
+let g:DirDiffExcludes=".git,*.d,*.o"
+
 set backupdir=~/.vim/.backup/
 set directory=~/.vim/.swp/
 set undofile
@@ -66,7 +69,7 @@ let g:ycm_auto_trigger = 1
 let g:ycm_collect_identifiers_from_tags_files = 1
 let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
 let g:ycm_complete_in_comments = 1 " Completion in comments
-let g:ycm_complete_in_strings = 1 " Completion in string
+" let g:ycm_complete_in_strings = 1 " Completion in string
 let g:ycm_add_preview_to_completeopt = 1
 "let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/.ycm_extra_conf.py'
@@ -162,8 +165,13 @@ noremap <C-x> :FZFMru<CR>
 "noremap <C-h> :CtrlPBookmarkDir<CR>
 "noremap <C-j> :call DmenuOpen("Files")<CR>
 " noremap <C-h> :call GetGitFolder("$HOME/GIT/")<CR>
-noremap <C-h> :call BrowseFolder("$HOME/GIT/")<CR>
-noremap <C-j> :call BrowseFolder(g:lastSearch)<CR>
+if has("gui_running")
+  noremap <C-h> :call BrowseFolderGui("$HOME/GIT/")<CR>
+  noremap <C-j> :call BrowseFolderGui(g:lastSearch)<CR>
+else
+  noremap <C-h> :call BrowseFolder("$HOME/GIT")<CR>
+  noremap <C-j> :call BrowseFolder(g:lastSearch)<CR>
+endif
 " noremap <C-j> :call GetLastGitFiles()<CR>
 let g:traceText = "OPERA_ERROR"
 noremap <C-l> :call InsertMethodTrace()<CR>
@@ -172,14 +180,21 @@ let g:CommandTFileScanner="find"
 "show class details
 nmap <F8> :TagbarToggle<CR>
 "open window
-nmap <F7> :QFix<CR>
+let g:asyncrun_open = 9
+nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
+" nmap <F7> :QFix<CR>
 "show header file
 nmap <F5> :FSSplitLeft<CR>
 nmap <F4> :AirlineToggleWhitespace<CR>
-nmap <F1> :AsyncRun buildPartial.sh mainline 34 sip 1 %:p:h<CR>5copen<CR>
+nmap <F1> :AsyncRun uploadFw.py mainline 120 121
 ":AsyncRun buildParse.sh mainline 34 sip 1
 
-nmap <F2> :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>5copen<CR>
+" nmap <F2> :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 9<CR>
+" nmap <F2> :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:wincmd w<CR>
+nmap <F2> :call BuildBind("")<CR>
+nmap <F3> :cnext<CR>
+" nmap ,rr  :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 10<CR>
+nmap ,ll  :let g:phones="121 122 123" \| let g:branch="mainline"
 "nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
 nmap <F9> :MundoToggle<CR>
 "nmap <F9> :match Error /\s\+$/<CR>
@@ -194,16 +209,22 @@ vmap <C-Down> ]egv
 
 "nnoremap <silent> ,cc :call ToggleComment()<CR>
 "vnoremap <silent> ,cu :call ToggleComment()<CR>
-noremap <silent> ,cc :call ToggleComment()<CR>
-noremap <silent> ,cx :call DoToggleComment()<CR>
-noremap <silent> ,cv :call UnToggleComment()<CR>
+" noremap  <silent> ,cc :call ToggleComment()<CR>
+noremap  <silent> ,cx :call DoToggleComment()<CR>
+noremap  <silent> ,cv :call UnToggleComment()<CR>
 " :c-r c-w = paste
-noremap <silent> ,bg :call BufferGrep()<CR>
-noremap <silent> ,br :call BufferReplace()<CR>
-noremap <silent> ,bb :call CtrlSF<CR>
-noremap <silent> ,fr :call FolderReplace()<CR>
-noremap <silent> ,fg :call FolderGrep()<CR>
-noremap <silent> ,ff :call FolderReplaceIn()<CR>
+nnoremap <silent> ,rb :call ReplaceBuffers("n")<CR>
+vnoremap <silent> ,rb :call ReplaceBuffers("v")<CR>
+nnoremap <silent> ,rp :call ReplacePath("n")<CR>
+vnoremap <silent> ,rp :call ReplacePath("v")<CR>
+nnoremap <silent> ,sb :call SearchBuffers("n")<CR>
+vnoremap <silent> ,sb :call SearchBuffers("v")<CR>
+nnoremap <silent> ,sp :call SearchPath("n")<CR>
+vnoremap <silent> ,sp :call SearchPath("v")<CR>
+" noremap  <silent> ,br :call BufferReplace()<CR>
+" noremap  <silent> ,bb :call GrepBuffers()<CR>
+" noremap  <silent> ,fr :call FolderReplace()<CR>
+" noremap  <silent> ,fg :call FolderGrep()<CR>
 "     noremap <silent> ,cc :<C-B>silent <C-E>s/^/<C-R>=escape(b:comment_leader,'\/')<CR>/<CR>:nohlsearch<CR>
 "     noremap <silent> ,cu :<C-B>silent <C-E>s/^\V<C-R>=escape(b:comment_leader,'\/')<CR>//e<CR>:nohlsearch<CR>
 
@@ -215,6 +236,14 @@ vnoremap <C-k> :call SearchAndReplacev()<CR>
   autocmd Syntax * syn match TabWhitespace /[\t]/
   autocmd Syntax * syn match DoubleSpaceAfterPeriod /\.  /" open gvim open file window
 augroup END
+
+let &errorformat="%f:%l:%c: %t%*[^:]:%m,%f:%l: %t%*[^:]:%m," . &errorformat
+set errorformat-=%f:%l:%m
+set errorformat-=%f:%l:\ %t%*[^:]:%m
+let g:asyncrun_auto = "make"
+
+let g:asyncrun_status = ''
+let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
 
 " paste in insert mode
 " C-r register
@@ -293,8 +322,8 @@ set updatetime=250
 
 """""FNC
 " toggles the quickfix window.
-let g:jah_Quickfix_Win_Height = 5
-command -bang -nargs=? QFix call QFixToggle(<bang>0)
+let g:jah_Quickfix_Win_Height = 10
+command! -bang -nargs=? QFix call QFixToggle(<bang>0)
 function! QFixToggle(forced)
   if exists("g:qfix_win") && a:forced == 0
     cclose
@@ -399,3 +428,48 @@ endif
 " fix molokai cursor disapearing on matching parenthesis
 "hi MatchParen      ctermfg=cyan ctermbg=208 cterm=bold
 hi MatchParen      ctermfg=208 ctermbg=233 cterm=bold
+
+"just test command system
+command! -nargs=1 GetBashResult call BashResult(<f-args>)
+function! BashResult(expr)
+  let g:res=system("echo $?")
+  echom "Got result "g:res
+endfunction
+
+
+" FZF color scheme updater from https://github.com/junegunn/fzf.vim/issues/59
+function! s:update_fzf_colors()
+  let rules =
+  \ { 'fg':      [['Normal',       'fg']],
+    \ 'bg':      [['Normal',       'bg']],
+    \ 'hl':      [['String',       'fg']],
+    \ 'fg+':     [['CursorColumn', 'fg'], ['Normal', 'fg']],
+    \ 'bg+':     [['CursorColumn', 'bg']],
+    \ 'hl+':     [['String',       'fg']],
+    \ 'info':    [['PreProc',      'fg']],
+    \ 'prompt':  [['Conditional',  'fg']],
+    \ 'pointer': [['Exception',    'fg']],
+    \ 'marker':  [['Keyword',      'fg']],
+    \ 'spinner': [['Label',        'fg']],
+    \ 'header':  [['Comment',      'fg']] }
+  let cols = []
+  for [name, pairs] in items(rules)
+    for pair in pairs
+      let code = synIDattr(synIDtrans(hlID(pair[0])), pair[1])
+      if !empty(name) && code != ''
+        call add(cols, name.':'.code)
+        break
+      endif
+    endfor
+  endfor
+  let s:orig_fzf_default_opts = get(s:, 'orig_fzf_default_opts', $FZF_DEFAULT_OPTS)
+  let $FZF_DEFAULT_OPTS = s:orig_fzf_default_opts .
+        \ (empty(cols) ? '' : (' --color='.join(cols, ',')))
+endfunction
+
+augroup _fzf
+  autocmd!
+  autocmd VimEnter,ColorScheme * call <sid>update_fzf_colors()
+augroup END
+
+let $FZF_DEFAULT_COMMAND = 'rg --files --follow -g "!{.git,node_modules}/*" 2>/dev/null'

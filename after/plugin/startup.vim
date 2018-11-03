@@ -270,12 +270,14 @@ function! InsertMethodTrace()
   let methodName=getline(search("^[^ \t#\"].\\{-}(", 'bW') )
   let arg_pos=match(methodName,"(")
   let output=methodName[0:arg_pos-1]
-
+  let output=substitute(output,'\/', '', '' )
+echom "xx"output
 """  call append(str2nr(lnum),"\tOPERA_ERROR(\"xx - " . xxx . " -> \")" )
   call setpos('.', save_cursor)
   execute 'normal o'
   "execute 'normal a' . "\<Tab>" . g:traceText . "(\"xx - " . xxx . " -> \\n\");"
-  execute 'normal a' . g:traceText . "(\"xx - " . output . " -> \\n\");"
+  execute 'silent s/\v^(\s*)/\1' . g:traceText . '(\"xx - ' . output . ' -> \\n\");'
+  " execute 'normal a' . g:traceText . "(\"xx - " . output . " -> \\n\");"
    execute 'normal l'
 "   startinsert
 ""  call search("\\%" . lnum . "l" . "\\%" . col . "c")
@@ -343,6 +345,120 @@ function! GetGitFiles(expr)
 endfunction
 
 
+let g:lastSearch=""
+let g:searchFor="dir"
+function! BrowseFolderGui(expr)
+  echom "brownse gui search for "a:expr
+  let a:search=a:expr
+  if a:search == "" || a:search == "."
+    let a:search="~/"
+  endif
+  if g:searchFor == "dir"
+    " echom "search dir"
+    let command = 'find ' . a:search . ' -maxdepth 3 -type d -and \( -not -path "*\.*" \) -and \( -not -path ' . a:search . ' \) | sort'
+    " let command = 'ls -1 -d ' . a:search . '/*/'
+  elseif g:searchFor == "file"
+    echom "search file gui"
+    " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . g:lastSearch
+    " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt|\.sh|\.py" -f -a --silent ' . a:search
+    let command = 'fd . -t f -E *.d -E *.o -E *.dep -E *.so -E *.jpg -E *.png -E *.bmp  -I -c never ' . a:search
+  else
+    echom "search default gui"
+    let command = 'ls -1 -d ' . a:search . '/*/'
+  endif
+  echom "command gui "command
+  if g:searchFor == "file"
+    call fzf#run({'source': command, 'sink*': function('GetOutputGui'), 'options': '--expect=ctrl-x,ctrl-f,ctrl-d --multi'})
+    " let a:search = fzf#run({'source': command, 'options': '--expect=ctrl-x,ctrl-f,ctrl-d --multi'})
+  else
+    call fzf#run({'source': command, 'sink*': function('GetOutputGui'), 'options': '--expect=ctrl-x,ctrl-f,ctrl-d'})
+    " let a:search = fzf#run({'source': command, 'options': '--expect=ctrl-x,ctrl-f,ctrl-d'})
+  endif
+  echom "end browse forder gui command "command
+endfunction
+
+let g:taskDone=""
+function! GetOutputGui(expr)
+  if type(a:expr) == 3
+    echom "getoutput gui >"join(a:expr)"<"
+  else
+    echom "GetOutput Gui >"a:expr"<"
+  endif
+  let a:search=a:expr
+  if !empty(a:search)
+    if type(a:search) == 3
+      if a:search[0] == "ctrl-x"
+        if len(a:search) == 1
+          let a:search=g:lastSearch
+          let a:search=fnamemodify(a:search,':h')
+        elseif !isdirectory(a:search[1])
+          let a:search=g:lastSearch
+          let a:search=fnamemodify(a:search,':h')
+        else
+          " echom "ctlr xhit on dir here "a:search[1]
+          let a:search=fnamemodify(a:search[1],':h')
+          let a:search=fnamemodify(a:search,':h')
+        endif
+        " echom "ctrlx - search again for got back to "a:search
+        let g:lastSearch=a:search
+        call BrowseFolderGui(a:search)
+        return
+      elseif a:search[0] == "ctrl-f"
+        if len(a:search) == 1
+          " echom " ctrl f hit on no result"
+          " echom "ctrl f search "g:lastSearch
+          let a:search=g:lastSearch
+        else
+          " echom "ctrl f search "g:lastSearch
+          " echom "ctrl f search "a:search[1]
+          let a:search=g:lastSearch
+        endif
+        let g:searchFor="file"
+        call BrowseFolderGui(a:search)
+        return
+      elseif a:search[0] == "ctrl-d"
+        if len(a:search) == 1
+          let a:search=g:lastSearch
+        elseif !isdirectory(a:search[1])
+          echom "show dir for file got "a:search[1]
+          let a:search=fnamemodify(a:search[1],':h')
+          let g:lastSearch=a:search
+        else
+          let a:search=g:lastSearch
+        endif
+        let g:searchFor="dir"
+        echom "ctrl-d call brownse gui "a:search
+        call BrowseFolderGui(a:search)
+        return
+      else
+        " echom "elsex "a:expr[0]
+        " echom "elsex "len(a:expr)
+        " echom "elsex "join(a:expr)
+        let g:lastSearch=a:search[1]
+        if isdirectory(a:search[1])
+          let a:search=a:search[1]
+          call BrowseFolderGui(a:search)
+          return
+        else
+          if !empty(a:search)
+            set cmdheight=2
+            let g:lastSearch=fnamemodify(a:search[0],':h')
+            for data in a:search
+              echom "open "data
+              exe "e " . data
+            endfor
+            set cmdheight=1
+          endif
+        endif
+        " echom "XXXX not type 3 "a:expr
+      endif
+    else
+      echom "not type 3"
+    endif
+  endif
+endfunction
+
+
 function! GetJustFolders(expr)
   echom a:expr
   echom "xx - GetGitSubFolder"
@@ -351,8 +467,154 @@ function! GetJustFolders(expr)
 "  Files a:expr<cr>
 endfunction
 
+
 let g:lastSearch=""
+function! BrowseFolderGuix(expr)
+  let a:search=""
+  echom "BrowseFolderGui "a:expr
+    call fzf#run({'source': 'ls -1 -d ' . a:expr . '/*/', 'sink*': function('GetOutputGui'), 'options': '--expect=ctrl-x,ctrl-f'})
+endfunction
+
+let g:taskDone=""
+function! GetOutputGuix(expr)
+  if type(a:expr) == 3
+    echom ">"join(a:expr)"<"
+  else
+    echom "GetOutputGui >"a:expr"<"
+  endif
+  if !empty(a:expr)
+    if type(a:expr) == 3
+      if a:expr[0] == "ctrl-x"
+        echom "got ctrl x"
+        let a:search=fnamemodify(g:previousSearch,':h')
+        let a:search=fnamemodify(a:search,':h')
+        let g:previousSearch=a:search
+        call BrowseFolderGui(a:search)
+        return
+      elseif a:expr[0] == "ctrl-f"
+        echom "got ctrl f"
+        " let a:previousSearch=a:expr[1]
+        " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . a:expr[1]
+        let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . g:previousSearch
+        call fzf#run({ 'source': command, 'sink':   'e' })
+        return
+      else
+        echom "elsex "a:expr[0]
+        echom "elsex "len(a:expr)
+        echom "elsex "join(a:expr)
+        let g:previousSearch = a:expr[1]
+        call BrowseFolderGui(a:expr[1])
+        return
+      endif
+    else
+      echom "not type 3"
+    endif
+  else
+    echom "empty?"
+  endif
+  return
+endfunction
+
+
+let g:lastSearch=""
+let g:searchFor="dir"
 function! BrowseFolder(expr)
+  let a:search=a:expr
+  if empty(a:search)
+    let a:search=g:lastSearch
+  endif
+  let g:lastSearch=a:search
+  while 1
+    " echom "search for "a:search
+    " echom "search for "g:searchFor
+    if a:search == "" || a:search == "."
+      let a:search="$HOME"
+    endif
+    if g:searchFor == "dir"
+      " echom "search dir"
+      let command = 'find ' . a:search . ' -maxdepth 3 -type d -and \( -not -path "*\.*" \) -and \( -not -path ' . a:search . ' \) | sort'
+      " let command = 'ls -1 -d ' . a:search . '/*/'
+    elseif g:searchFor == "file"
+      echom "search file"
+      " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . g:lastSearch
+      " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt|\.sh|\.py" -f -a --silent ' . a:search
+      let command = 'fd . -t f -E *.d -E *.o -E *.dep -E *.so -E *.jpg -E *.png -E *.bmp  -I -c never ' . a:search 
+    else
+      echom "search default"
+      let command = 'ls -1 -d ' . a:search . '/*/'
+    endif
+      " call fzf#run({ 'source': command, 'sink':   'e' })
+    " echom "command "command
+    if g:searchFor == "file"
+      let a:search = fzf#run({'source': command, 'options': '--expect=ctrl-x,ctrl-f,ctrl-d --multi'})
+    else
+      let a:search = fzf#run({'source': command, 'options': '--expect=ctrl-x,ctrl-f,ctrl-d'})
+    endif
+    if !empty(a:search)
+      " echom "got dir result"join(a:search)
+      if a:search[0] == "ctrl-x"
+        if len(a:search) == 1
+          echom "hit on no result  use last search "g:lastSearch
+          let a:search=g:lastSearch
+          let a:search=fnamemodify(a:search,':h')
+          echom "hit on no result  use last search reduced "a:search
+        elseif !isdirectory(a:search[1])
+          echom "ctrlx hit on file"
+          let a:search=g:lastSearch
+          let a:search=fnamemodify(a:search,':h')
+        else
+          echom "ctlr xhit on dir here "a:search[1]
+          let a:search=fnamemodify(a:search[1],':h')
+          let a:search=fnamemodify(a:search,':h')
+        endif
+        echom "ctrlx - search again for got back to "a:search
+        let g:lastSearch=a:search
+        continue
+      elseif a:search[0] == "ctrl-f"
+        if len(a:search) == 1
+          " echom " ctrl f hit on no result"
+          " echom "ctrl f search "g:lastSearch
+          let a:search=g:lastSearch
+        else
+          " echom "ctrl f search "g:lastSearch
+          " echom "ctrl f search "a:search[1]
+          let a:search=g:lastSearch
+        endif
+        let g:searchFor="file"
+        continue
+      elseif a:search[0] == "ctrl-d"
+        if len(a:search) == 1
+          let a:search=g:lastSearch
+        elseif !isdirectory(a:search[1])
+          echom "show dir for file got "a:search[1]
+          let a:search=fnamemodify(a:search[1],':h')
+          let g:lastSearch=a:search
+        else
+          let a:search=g:lastSearch
+        endif
+        let g:searchFor="dir"
+        continue
+      endif
+      let g:lastSearch=a:search[1]
+      if isdirectory(a:search[1])
+        let a:search=a:search[1]
+        continue
+      endif
+    endif
+    break
+  endwhile
+  if !empty(a:search)
+    set cmdheight=2
+    let g:lastSearch=fnamemodify(a:search[0],':h')
+    for data in a:search
+      exe "e " . data
+    endfor
+    set cmdheight=1
+  endif
+endfunction
+
+let g:lastSearchx=""
+function! BrowseFolderx(expr)
   let a:search=a:expr
   echom "search for "a:search
   if empty(a:search)
@@ -369,13 +631,19 @@ function! BrowseFolder(expr)
       " continue
     " endif
     " let a:search = fzf#run({'source': 'ls -1 -d ' . a:search . '/*/', 'sink*': function('GetOutput'), 'options': '--expect=ctrl-x'})
-    let a:search = fzf#run({'source': 'ls -1 -d ' . a:search . '/*/', 'options': '--expect=ctrl-x'})
+    let a:search = fzf#run({'source': 'ls -1 -d ' . a:search . '/*/', 'options': '--expect=ctrl-x,ctrl-f'})
     if !empty(a:search)
+      echom "got dir result"join(a:search)
       if a:search[0] == "ctrl-x"
         let a:search=fnamemodify(a:previousSearch,':h')
         let a:search=fnamemodify(a:search,':h')
         let a:previousSearch=a:search
         continue
+      elseif a:search[0] == "ctrl-f"
+        echom "ctrl f search "a:previousSearch
+        let a:search=a:previousSearch
+        echom "hit on ctrlf "a:previousSearch
+        break
       endif
       let a:previousSearch=a:search[1]
       let a:search=a:previousSearch
@@ -426,12 +694,66 @@ function! SearchAndReplace()
  " echo l:currentWord
  " echo "eeee" .  l:currentWord
 "  call feedkeys("iHello\<CR>Universe!")
-  call feedkeys(":%s/" . l:currentWord ."//g","t")
+  call feedkeys(":,$s/" . l:currentWord ."//gc","t")
 
 endfunction
 
 function! SearchAndReplacev() range
   echom "mode "mode()
+    if mode()=="v"
+        let [line_start, column_start] = getpos("v")[1:2]
+        let [line_end, column_end] = getpos(".")[1:2]
+        " echom join(getpos("."))
+        " echom join(getpos("v"))
+    else
+        let [line_start, column_start] = getpos("'<")[1:2]
+        let [line_end, column_end, column_extra] = getpos("'>")[1:3]
+        " echom join(getpos("'<"))
+        " echom join(getpos("'>"))
+    end
+    " getpos gets extra param for end '> if line is too short,
+    " if highlight goes from back to from column start end need to be switched
+    if column_extra != 0
+      let l:colsum=column_end+column_extra
+      if l:colsum>column_start
+        let l:width=(column_end+column_extra)-column_start-1
+        " echom "lwidth1_"l:width
+      else
+        let l:width=column_start-(column_end+column_extra)-1
+        let column_start=l:colsum
+        " echom "lwidth2_"l:width
+      endif
+    else
+      if column_end>column_start
+        let l:width=column_end-column_start-1
+        " echom "lwidth3_"l:width
+      else
+        let l:width=column_start-column_end-1
+        let column_start=column_end
+        " echom "lwidth4_"l:width
+      endif
+    endif
+    let line0 = getline(line_start)
+    if len(line0) == 0
+            return ''
+    endif
+    let replacement=""
+    call inputsave()
+    let a:replacement = input('Enter replacement:')
+    call inputrestore()
+    if empty(a:replacement)
+      let a:replacement = line0[column_start - 1: column_start + l:width]
+    endif
+"     " let l:currentWord = substitute(@*, '\n', '', 'g')
+    if (line_start != line_end )
+      call feedkeys(":'<,'> s/" . a:replacement ."//gc","t")
+    else
+      call feedkeys(":,$s/" . a:replacement ."//gc","t")
+    endif
+endfunction
+
+
+function! GetVisualSelectionText() range
     if mode()=="v"
         let [line_start, column_start] = getpos("v")[1:2]
         let [line_end, column_end] = getpos(".")[1:2]
@@ -472,8 +794,9 @@ function! SearchAndReplacev() range
     endif
     let l:currentWord = line0[column_start - 1: column_start + l:width]
 "     " let l:currentWord = substitute(@*, '\n', '', 'g')
-  call feedkeys(":%s/" . l:currentWord ."//g","t")
+    return l:currentWord
 endfunction
+
 
 "grep over all file in dir + auto update
 " vimgrep /CurrencyNumberHelper/ app/models/*.rb
@@ -731,10 +1054,10 @@ function! SessionName(...)
      return g:session_name
 endfunction
 call airline#parts#define_function('session_name', 'SessionName')
-call airline#parts#define_accent('session_name', 'blue')
+call airline#parts#define_accent('session_name', 'orange')
 " let g:airline_section_x = airline#section#create_right(['tagbar', 'gutentags', 'grepper','filetype','session_name'])
-let g:airline_section_x = airline#section#create_right(['tagbar', 'gutentags', 'grepper','session_name'])
-
+" let g:airline_section_x = airline#section#create_right(['tagbar', 'gutentags', 'grepper','session_name'])
+let g:airline_section_y = airline#section#create_right(['ffenc','session_name'])
 
 function! BufferGrep()
   let currBuff=bufnr("%")
@@ -780,7 +1103,144 @@ function! FolderReplaceIn()
   exe cmd
 endfunction
 
-function! Test()
-  let cmd = input("", "call FileTypeToggle(\"\")\<left>\<left>")
-  exe cmd
+" function! Test()
+  " let cmd = input("", "call FileTypeToggle(\"\")\<left>\<left>")
+  " exe cmd
+" endfunction
+
+
+function! Ttt()
+  let a=["11","22","33","44","11"]
+  echom join(a)
+  " call sort(a, function("Strcmp"))
+  let b=uniq(sort(a))
+  echom join(b)
+endfunction
+
+let g:grepTarget="files"
+function! ReplacePath(expr)
+  let g:grepTarget="dir"
+  call ReplaceBuffers(a:expr)
+endfunction
+
+let g:grepTarget="files"
+function! ReplaceBuffers(expr)
+  let searchTerm=""
+  if a:expr == "n" || a:expr == ""
+    let searchTerm=expand("<cword>")
+  elseif a:expr == "v"
+    let searchTerm = GetVisualSelectionText()
+  else
+    let searchTerm = a:expr
+  endif
+  call inputsave()
+  let a:input = input('Enter search string <' . searchTerm .'>:')
+  call inputrestore()
+  if !empty(a:input)
+    let searchTerm=a:input
+  endif
+  if (empty(searchTerm))
+    return
+  endif
+  let bufnrs = filter(range(1,bufnr('$')),'bufexists(v:val)')
+  " let bufnames = join(map(bufnrs,'expand("#".v:val.":p:h")."/"'), " " )
+  let bufnames=[]
+  if g:grepTarget=="files"
+    let bufnames = map(bufnrs,'expand("#".v:val.":p")')
+  else
+    let bufnames = map(bufnrs,'expand("#".v:val.":p:h")."/"')
+  endif
+  let setnames = uniq(sort(bufnames))
+  let bufnames = filter(setnames,'!empty(glob(v:val))')
+  let bufnames = join(bufnames," ")
+  " let bufnames = join(map(bufnrs,'expand("#".v:val.":p")'), " " ) " all
+  " files
+  " let bufnames = bufnames . " " .expand('%:p:h'). "/*"
+  " let setBufNames = uniq(bufnames)
+  " echom bufnames
+  " echo expand("#3:p")
+  " let l:xx = join(map(filter(copy(range(1, bufnr('$'))), 'buflisted(v:val)'), '" ".fnamemodify(bufname(v:val), ":p")'), " ")
+  " echom l:xx
+  let g:grepTarget="files"
+  exe "CtrlSF " . searchTerm . " " . bufnames
+endfunction
+
+
+function! SearchBuffers(expr)
+  echom "got input " . a:expr
+  let searchTerm=""
+  if a:expr == "n" || a:expr == ""
+    let searchTerm=expand("<cword>")
+  elseif a:expr == "v"
+    let searchTerm = GetVisualSelectionText()
+  else
+    let searchTerm = a:expr
+  endif
+  call inputsave()
+  let a:input = input('Enter search string <' . searchTerm .'>:')
+  call inputrestore()
+  if !empty(a:input)
+    let searchTerm=a:input
+  endif
+  if (empty(searchTerm))
+    echom "nothing to search for"
+    return
+  endif
+  let searchTerm = substitute( searchTerm, " ","\\\\ ", "g")
+  exe "Back! -Q " . searchTerm
+endfunction
+
+
+function! SearchPath(expr)
+  echom "got input " . a:expr
+  let searchTerm=""
+  if a:expr == "n" || a:expr == ""
+    let searchTerm=expand("<cword>")
+  elseif a:expr == "v"
+    let searchTerm = GetVisualSelectionText()
+  else
+    let searchTerm = a:expr
+  endif
+  if (empty(searchTerm))
+    echom "nothing to search for"
+    return
+  endif
+  let currentPath=expand('%:p:h')
+  if empty(glob(currentPath))
+    let currentPath="$HOME/"
+  endif
+  let searchTerm = substitute( searchTerm, " ","\\\\ ", "g")
+  " let cmd = input("",":Ack -Q " . searchTerm . " " . currentPath)
+  call feedkeys(":Ack! -Q " . searchTerm . " " . currentPath,"t")
+endfunction
+
+" all scripts exit with make exit code (vagrant->local buildScript -> asyncRes
+" code)
+function! BuildBind(expr)
+  exe "AsyncRun -post=UploadFw() buildParse.sh mainline 34 sip 1 %:p:h"
+  exe "wincmd w"
+endfunction
+
+command! -nargs=1 UploadFw call UploadFw()
+function! UploadFw()
+  echom "Status "g:asyncrun_code
+  " let nrOfErrors=len(filter(getqflist(),'v:val.valid'))
+  if g:asyncrun_code == 0
+    echom "trigger phones"
+    exe "AsyncRun uploadFw.py mainline 120 121"
+  else
+    echom "check logs"
+    exe "cnext"
+  endif
+endfunction
+
+
+function! RemoveLineFromQuickFix( line )
+  let l:line = a:line - 1
+  call setqflist( filter( getqflist(), "v:key['lnum'] != l:line" ) )
+endfunction
+
+function! RemoveSameBuffersFromQuickFix( line )
+  let l:line = a:line - 1
+  call setqflist( filter( getqflist(), "v:key['lnum'] != l:line" ) )
 endfunction
