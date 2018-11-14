@@ -122,3 +122,15 @@
 [submodule "ferret"]
 	path = ferret
 	url = https://github.com/wincent/ferret.git
+[submodule "vim-codequery"]
+	path = vim-codequery
+	url = https://github.com/devjoe/vim-codequery.git
+[submodule "vim-lsp"]
+	path = vim-lsp
+	url = https://github.com/prabirshrestha/vim-lsp.git
+[submodule "vim-lsp-cquery"]
+	path = vim-lsp-cquery
+	url = https://github.com/pdavydov108/vim-lsp-cquery.git
+[submodule "async.vim"]
+	path = async.vim
+	url = https://github.com/prabirshrestha/async.vim.git

@@ -249,10 +249,39 @@ endfunction
 
 
 " call TraceHide("physical\\|CallView\\|HealthService\\|Service\\|DnsMgr\\|CodecManager\\|Beatnik")
-
-
-
-
+let g:traceString=""
+function! GetTraceString()
+  if !empty(g:traceString)
+    return g:traceString
+  endif
+  let l:traceString=get(g:traceStringFound,expand('%'))
+  echom "previous match? ".l:traceString." ".empty(l:traceString)."<"
+  if empty(l:traceString)
+    let save_cursor = getpos(".")
+    let searchStringPattern="OPERA_.\\{-}(\\|SG_.\\{-}(\\|VCR_.\\{-}\\|GA_.\\{-}("
+    let l:traceString=getline(search(l:searchStringPattern ))
+    " echom "got line ". l:traceString
+    let traceType=matchstr(l:traceString,"OPERA\\|SG\\|VCR\\|GA")
+    echom "got trace ". traceType
+    if traceType == "OPERA"
+      let l:traceString="OPERA_ERROR"
+    elseif traceType=="SG"
+      let l:traceString="SG_ERROR_V"
+    elseif traceType=="GA"
+      let l:traceString="GA_ERROR"
+    elseif traceType=="VCR"
+      let l:traceString="VCR_ERR"
+    endif
+    " echom "got trace ". l:traceString
+    if !empty(l:traceString)
+      let g:traceStringFound[expand('%:t')]=l:traceString
+    else
+      let l:traceString=g:traceText
+    endif
+    call setpos('.', save_cursor)
+  endif
+  return l:traceString
+endfunction
 
 
 
@@ -262,21 +291,24 @@ endfunction
 "   echom search("^[^ \t#\"].\\{-}.::", 'bW')
 "        let methodName_end = getpos(")")[2]
 "http://ricostacruz.com/cheatsheets/vimscript
+let g:traceStringFound={}
 function! InsertMethodTrace()
+  let l:traceString=GetTraceString()
   let save_cursor = getpos(".")
-
   " match only c++ ::methods
-  "let methodName=getline(search("^[^ \t#\"].\\{-}.::.\\{-}(", 'bW') )
-  let methodName=getline(search("^[^ \t#\"].\\{-}(", 'bW') )
+  let methodName=getline(search("^[^ \t#\"].\\{-} \\{-}.::.\\{-}(", 'bW') )
+  " let methodName=getline(search("^[^ \t#\"].\\{-}(", 'bW') )
   let arg_pos=match(methodName,"(")
   let output=methodName[0:arg_pos-1]
   let output=substitute(output,'\/', '', '' )
-echom "xx"output
 """  call append(str2nr(lnum),"\tOPERA_ERROR(\"xx - " . xxx . " -> \")" )
   call setpos('.', save_cursor)
   execute 'normal o'
+  "test GW_ERROR(
   "execute 'normal a' . "\<Tab>" . g:traceText . "(\"xx - " . xxx . " -> \\n\");"
-  execute 'silent s/\v^(\s*)/\1' . g:traceText . '(\"xx - ' . output . ' -> \\n\");'
+  " execute 'silent s/\v^(\s*)/\1' . g:traceText . '(\"xx - ' . output . ' -> \\n\");'
+  execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> \n");'
+
   " execute 'normal a' . g:traceText . "(\"xx - " . output . " -> \\n\");"
    execute 'normal l'
 "   startinsert
@@ -350,18 +382,19 @@ let g:searchFor="dir"
 function! BrowseFolderGui(expr)
   echom "brownse gui search for "a:expr
   let a:search=a:expr
-  if a:search == "" || a:search == "."
-    let a:search="~/"
+  if a:search == "" || a:search == "." || len(a:search) < 10
+    echom "weird a:search" . a:search
+    let a:search="/home/km000057/GIT/"
   endif
   if g:searchFor == "dir"
     " echom "search dir"
-    let command = 'find ' . a:search . ' -maxdepth 3 -type d -and \( -not -path "*\.*" \) -and \( -not -path ' . a:search . ' \) | sort'
+    let command = 'find ' . a:search . ' -maxdepth 2 -type d -and \( -not -path "*\.*" \) -and \( -not -path ' . a:search . ' \) | sort'
     " let command = 'ls -1 -d ' . a:search . '/*/'
   elseif g:searchFor == "file"
     echom "search file gui"
     " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . g:lastSearch
     " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt|\.sh|\.py" -f -a --silent ' . a:search
-    let command = 'fd . -t f -E *.d -E *.o -E *.dep -E *.so -E *.jpg -E *.png -E *.bmp  -I -c never ' . a:search
+    let command = 'fd . -t f -E *.d -E *.o -E *.dep -E *.so -E *.jpg -E *.png -E *.bmp  -I -j 4 -c never ' . a:search
   else
     echom "search default gui"
     let command = 'ls -1 -d ' . a:search . '/*/'
@@ -388,6 +421,7 @@ function! GetOutputGui(expr)
   if !empty(a:search)
     if type(a:search) == 3
       if a:search[0] == "ctrl-x"
+        let g:searchFor="dir"
         if len(a:search) == 1
           let a:search=g:lastSearch
           let a:search=fnamemodify(a:search,':h')
@@ -441,11 +475,18 @@ function! GetOutputGui(expr)
           return
         else
           if !empty(a:search)
+            let g:searchFor="dir"
+            echom "Open " . join(a:search)
             set cmdheight=2
-            let g:lastSearch=fnamemodify(a:search[0],':h')
+            let g:lastSearch=fnamemodify(a:search[1],':h')
+            echom ">g:lastSearch " . g:lastSearch
             for data in a:search
-              echom "open "data
-              exe "e " . data
+              if !empty(data)
+                echom "open >" . data . "<"
+                exe "e " . data
+              else
+                echom "empty data "
+              endif
             endfor
             set cmdheight=1
           endif
@@ -527,8 +568,8 @@ function! BrowseFolder(expr)
   while 1
     " echom "search for "a:search
     " echom "search for "g:searchFor
-    if a:search == "" || a:search == "."
-      let a:search="$HOME"
+    if a:search == "" || a:search == "." || len(a:search) < 10
+      let a:search="/home/km000057/GIT/"
     endif
     if g:searchFor == "dir"
       " echom "search dir"
@@ -538,7 +579,7 @@ function! BrowseFolder(expr)
       echom "search file"
       " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt" -f -a --silent ' . g:lastSearch
       " let command = 'ag -l --nocolor -g "cpp|\.h|makefile|\.txt|\.sh|\.py" -f -a --silent ' . a:search
-      let command = 'fd . -t f -E *.d -E *.o -E *.dep -E *.so -E *.jpg -E *.png -E *.bmp  -I -c never ' . a:search 
+      let command = 'fd . -t f -E *.d -E *.o -E *.dep -E *.so -E *.jpg -E *.png -E *.bmp  -I -j 4 -c never ' . a:search 
     else
       echom "search default"
       let command = 'ls -1 -d ' . a:search . '/*/'
@@ -553,6 +594,7 @@ function! BrowseFolder(expr)
     if !empty(a:search)
       " echom "got dir result"join(a:search)
       if a:search[0] == "ctrl-x"
+        let g:searchFor="dir"
         if len(a:search) == 1
           echom "hit on no result  use last search "g:lastSearch
           let a:search=g:lastSearch
@@ -567,7 +609,7 @@ function! BrowseFolder(expr)
           let a:search=fnamemodify(a:search[1],':h')
           let a:search=fnamemodify(a:search,':h')
         endif
-        echom "ctrlx - search again for got back to "a:search
+        " echom "ctrlx - search again for got back to "a:search
         let g:lastSearch=a:search
         continue
       elseif a:search[0] == "ctrl-f"
@@ -586,7 +628,7 @@ function! BrowseFolder(expr)
         if len(a:search) == 1
           let a:search=g:lastSearch
         elseif !isdirectory(a:search[1])
-          echom "show dir for file got "a:search[1]
+          " echom "show dir for file got "a:search[1]
           let a:search=fnamemodify(a:search[1],':h')
           let g:lastSearch=a:search
         else
@@ -605,12 +647,16 @@ function! BrowseFolder(expr)
   endwhile
   if !empty(a:search)
     set cmdheight=2
-    let g:lastSearch=fnamemodify(a:search[0],':h')
+    let g:lastSearch=fnamemodify(a:search[1],':h')
     for data in a:search
+      if empty(data)
+        continue
+      endif
       exe "e " . data
     endfor
     set cmdheight=1
   endif
+  let g:searchFor="dir"
 endfunction
 
 let g:lastSearchx=""
@@ -699,58 +745,112 @@ function! SearchAndReplace()
 endfunction
 
 function! SearchAndReplacev() range
+  "called from visual mode
   echom "mode "mode()
-    if mode()=="v"
-        let [line_start, column_start] = getpos("v")[1:2]
-        let [line_end, column_end] = getpos(".")[1:2]
-        " echom join(getpos("."))
-        " echom join(getpos("v"))
+  let [line_start, column_start] = getpos("'<")[1:2]
+  let [line_end, column_end, column_extra] = getpos("'>")[1:3]
+  " echom join(getpos("'<"))
+  " echom join(getpos("'>"))
+  " getpos gets extra param for end '> if line is too short,
+  " if highlight goes from back to from column start end need to be switched
+  if column_extra != 0
+    let l:colsum=column_end+column_extra
+    if l:colsum>column_start
+      let l:width=(column_end+column_extra)-column_start-1
+      " echom "lwidth1_"l:width
     else
-        let [line_start, column_start] = getpos("'<")[1:2]
-        let [line_end, column_end, column_extra] = getpos("'>")[1:3]
-        " echom join(getpos("'<"))
-        " echom join(getpos("'>"))
-    end
-    " getpos gets extra param for end '> if line is too short,
-    " if highlight goes from back to from column start end need to be switched
-    if column_extra != 0
-      let l:colsum=column_end+column_extra
-      if l:colsum>column_start
-        let l:width=(column_end+column_extra)-column_start-1
-        " echom "lwidth1_"l:width
-      else
-        let l:width=column_start-(column_end+column_extra)-1
-        let column_start=l:colsum
-        " echom "lwidth2_"l:width
-      endif
+      let l:width=column_start-(column_end+column_extra)-1
+      let column_start=l:colsum
+      " echom "lwidth2_"l:width
+    endif
+  else
+    if column_end>column_start
+      let l:width=column_end-column_start-1
+      " echom "lwidth3_"l:width
     else
-      if column_end>column_start
-        let l:width=column_end-column_start-1
-        " echom "lwidth3_"l:width
-      else
-        let l:width=column_start-column_end-1
-        let column_start=column_end
-        " echom "lwidth4_"l:width
-      endif
+      let l:width=column_start-column_end-1
+      let column_start=column_end
+      " echom "lwidth4_"l:width
     endif
-    let line0 = getline(line_start)
-    if len(line0) == 0
-            return ''
-    endif
-    let replacement=""
-    call inputsave()
+  endif
+  if (line_start != line_end )
+    echom "use search and replace block method"
+    call SearchandreplaceBlock()
+    return
+  endif
+  let line0 = getline(line_start)
+  if len(line0) == 0
+          return ''
+  endif
+  let replacement=""
+  call inputsave()
+  if (line_start != line_end )
+    let a:searchString = input('Enter search string:')
+    let a:replacement = ""
+  else
     let a:replacement = input('Enter replacement:')
-    call inputrestore()
-    if empty(a:replacement)
-      let a:replacement = line0[column_start - 1: column_start + l:width]
-    endif
-"     " let l:currentWord = substitute(@*, '\n', '', 'g')
-    if (line_start != line_end )
-      call feedkeys(":'<,'> s/" . a:replacement ."//gc","t")
-    else
-      call feedkeys(":,$s/" . a:replacement ."//gc","t")
-    endif
+    let a:searchString = line0[column_start - 1: column_start + l:width]
+  endif
+  call inputrestore()
+  echom "xxx>".replacement
+"   " let l:currentWord = substitute(@*, '\n', '', 'g')
+  call feedkeys(":,$s/" . a:searchString . "/" . a:replacement ."/gc","t")
 endfunction
+
+"replace string in block or multiline with string
+function! SearchandreplaceBlock() range
+  let vmode = visualmode()
+  echom "vmode>".vmode."<"
+  if vmode == "v"
+    echom "line select mode"
+  elseif vmode == ""
+    echom "V"
+  elseif vmode == ""
+    echom "Block select mode"
+    echom "cV"
+  else
+    echom "??" . vmode
+  endif
+  let [line0, line_start, column_start, column0] = getpos("'<")
+  let [linex, line_end, column_end, columnx ] = getpos("'>")
+  " echom join(getpos("'<"))
+  " echom join(getpos("'>"))
+  let column_start = column_start-1
+  let column_end = column_end-1
+  let loopCount=line_start
+  let lines=[]
+  while (loopCount <= line_end)
+    call add(lines, getline(loopCount))
+    let loopCount=loopCount+1
+  endwhile
+  if vmode == ""
+    let lines = map(lines,'v:val[' . column_start . ':'. column_end . ']')
+    let linesuniq = uniq(sort(copy(lines)))
+    echom "Replace for : " . join(linesuniq," <> ")
+    let inputStr = "Enter replacement params(s) " . len(linesuniq). ": "
+    call inputsave()
+      let a:replacement = input( inputStr )
+    call inputrestore()
+    if len(linesuniq) == 1
+      let searchstring = linesuniq[0]
+      call feedkeys(":,$S/" . searchstring . "/" . a:replacement . "/gc")
+    else
+      let searchstring = join(linesuniq,", ")
+      call feedkeys(":,$S/{" . searchstring . "}/{" . a:replacement . "}/gc")
+    endif
+  elseif vmode == "v"
+    let lines[0] = lines[0][ column_start : ]
+    let lines[-1] = lines[-1][ : column_end ]
+    call inputsave()
+      let a:replacement = input( "Replacement string" )
+    call inputrestore()
+    let lines=join(lines,"\\_.")
+    call feedkeys(":,$s/" . lines . "/" . a:replacement . "/gc")
+    " call feedkeys(":,$S/{" . searchstring . "}/{" . a:replacement . "}/gc")
+  endif
+  return
+endfunction
+
 
 
 function! GetVisualSelectionText() range
@@ -1109,7 +1209,9 @@ endfunction
 " endfunction
 
 
-function! Ttt()
+command! -nargs=? Ddd call Ttt(<f-args>)
+function! Ttt(...)
+  echom ">>>" . a:expr
   let a=["11","22","33","44","11"]
   echom join(a)
   " call sort(a, function("Strcmp"))
@@ -1216,31 +1318,359 @@ endfunction
 
 " all scripts exit with make exit code (vagrant->local buildScript -> asyncRes
 " code)
+let g:gitfolder="mainline"
 function! BuildBind(expr)
-  exe "AsyncRun -post=UploadFw() buildParse.sh mainline 34 sip 1 %:p:h"
+  call inputsave()
+    let l:target = input( "targetPhones? " . g:targetPhones . "?" )
+  call inputrestore()
+  if !empty(l:target)
+    let g:targetPhones=l:target
+  endif
+  let folder=expand('%:p:h')
+  echom "folder ".folder."<"
+  let g:gitfolder = matchstr(folder,'km000057/.\{-}/\zs.\{-}\ze/')
+  echom ">gitfolder " . g:gitfolder."<"
+  if index(map(["v3r5","main2","mainline","smainline"], 'v:val == g:gitfolder'),1) == -1
+    echom "unknown git folder " . g:gitfolder
+    return
+  endif
+  let targetModel="34"
+  echom "math for phones ". g:targetPhones
+  if index(map(["120","121","122","125"], 'matchstr(g:targetPhones, v:val) != "" '),1) != -1
+  " if index(map(copy(g:targetPhones) , 'v:val == "120" || v:val == "121" || v:val == "122" || v:val == "125"'),1) != -1
+    echom "This is WE34 phone"
+    let targetModel="34"
+  elseif index(map(["128"], 'matchstr(g:targetPhones, v:val) != "" '),1) != -1
+    echom "this is WE2 phone"
+    let targetModel="2"
+  elseif index(map(["123"], 'matchstr(g:targetPhones, v:val) != "" '),1) != -1
+    echom "this is WE1 phone"
+    let targetModel="1"
+  endif
+  " if matchstr(g:targetPhones,"")
+  echom "run build ".g:gitfolder. " " . targetModel . "<"
+  " exe "AsyncRun -post=UploadFw() buildParse.sh v3r5 2 sip 1 %:p:h"
+  exe "AsyncRun -post=call\\ UploadFw() buildParse.sh " . g:gitfolder . " " . targetModel . " sip 1 %:p:h"
+  " exe "AsyncRun -post=UploadFw() buildParse.sh mainline 34 sip 1 %:p:h"
   exe "wincmd w"
 endfunction
 
-command! -nargs=1 UploadFw call UploadFw()
+let g:targetPhones=" 128 "
+" command! UploadFw call UploadFw()
+" command! -nargs=1 UploadFw call UploadFw()
+" function! UploadFw(expr)
 function! UploadFw()
-  echom "Status "g:asyncrun_code
+  echom "Status ".g:asyncrun_code
+  " echom "input  ". a:expr
+  if empty(g:gitfolder)
+    echom "Git folder not specified ". a:expr
+    return
+  endif
   " let nrOfErrors=len(filter(getqflist(),'v:val.valid'))
-  if g:asyncrun_code == 0
+  " let nrOfErrors=len(filter(getqflist(),'matchstr(v:val.text,"error") != ""'))
+  let nrOfErrors=len(filter(getqflist(),'matchstr(v:val.text,"\\CError") != "" || matchstr(v:val.text,"error:") != ""'))
+  echom "nr of errors " . nrOfErrors
+  if g:asyncrun_code == 0 && nrOfErrors == 0
     echom "trigger phones"
-    exe "AsyncRun uploadFw.py mainline 120 121"
+    exe "AsyncRun uploadFw.py ". g:gitfolder . " " . g:targetPhones
+" nmap <F1> :AsyncRun uploadFw.py mainline 120 121
   else
     echom "check logs"
-    exe "cnext"
+    exe "clast"
+    exe "cprevious"
   endif
 endfunction
 
+" Upload Error
+function! ParseQuickFix()
+  let nrOfErrors=len(filter(getqflist(),'matchstr(v:val.text,"\\CError") != "" || matchstr(v:val.text,"error:") != ""'))
+  echom nrOfErrors
+  let xx = getqflist()
+  for line in xx
+    if matchstr(line.text, "error") != ""
+      echom "BAD"
+    endif
+  endfor
+endfunction
 
 function! RemoveLineFromQuickFix( line )
   let l:line = a:line - 1
   call setqflist( filter( getqflist(), "v:key['lnum'] != l:line" ) )
 endfunction
 
-function! RemoveSameBuffersFromQuickFix( line )
-  let l:line = a:line - 1
-  call setqflist( filter( getqflist(), "v:key['lnum'] != l:line" ) )
+function! QfToRename(...)
+  let searchTerm=""
+  if a:0 == 0
+    " let searchTerm = expand("<cword>")
+    let searchTerm = getreg('/')
+    echom "no search term got "searchTerm
+  else
+    let searchTerm = a:1
+    echom "got search term "searchTerm
+  endif
+  let qflist=getqflist()
+  let filePaths=""
+  if empty(qflist)
+    echom "no data"
+    return
+  endif
+  let filepaths=[]
+  for item in qflist
+    call add(filepaths, expand('#'.item.bufnr))
+    " let filePaths=filePaths . " " . expand('#'.item.bufnr)
+  endfor
+  let filepaths = uniq(sort(filepaths))
+  let filepaths = filter(filepaths,'!empty(glob(v:val))')
+  let filepaths = join(filepaths," ")
+  echom "filepaths "filepaths
+  echom "search term  "searchTerm
+  exe "CtrlSF " . searchTerm . " " . filepaths
+endfunction
+
+" function FooBar(...) " This is like *args in python
+    " echom a:0 " a:0 contains an integer which is the number of arguments passed to the function
+    " echom a:1 " a:1 contains the first argument passed, a:2 contains the second and so on
+    " echo a:000 " a:000 contains a list of all arguments that were passed to the function
+  " endfunction
+  "
+  " ifunction! FunctionName(arg1,...)
+    " let a:arg2 = get(a:, 1, 0)
+    " let a:arg3 = get(a:, 2, 0)
+"
+    " if a:arg2
+      " Do stuff with arguments"
+    " else
+      " Do stuff without arguments"
+    " endif
+" endfunction
+"
+" in which get(a:, n, default) will get the nth optional argument returning default if it's not present.
+"
+function! ClangCheckImpl(cmd)
+  if &autowrite | wall | endif
+  echo "Running " . a:cmd . " ..."
+  let l:output = system(a:cmd)
+  cexpr l:output
+  cwindow
+  let w:quickfix_title = a:cmd
+  if v:shell_error != 0
+    cc
+  endif
+  let g:clang_check_last_cmd = a:cmd
+endfunction
+
+function! ClangCheck()
+  let l:filename = expand('%')
+  if l:filename =~ '\.\(cpp\|cxx\|cc\|c\)$'
+    call ClangCheckImpl("clang-check " . l:filename)
+  elseif exists("g:clang_check_last_cmd")
+    call ClangCheckImpl(g:clang_check_last_cmd)
+  else
+    echo "Can't detect file's compilation arguments and no previous clang-check invocation!"
+  endif
+endfunction
+
+
+function! SetTags(expr)
+  echom "Path " . a:expr
+  let g:tagPath=a:expr . "/phones.tag" 
+  exe "set tags=" . g:tagPath
+  exe "cs kill cscope.files"
+  exe "cs add " . a:expr . "/vobs/cscope.files" . " " . " "
+  exe "cs reset"
+  let g:my_db_path=a:expr. "/"
+endfunction
+
+
+
+
+function! ShowAllChanges()
+  echom "show all changes"
+  let saveCurrentBuffer=bufnr('%')
+  exe "cexpr[]"
+  let bufnrs = filter(range(1,bufnr('$')),'bufexists(v:val)')
+  let bufnames=[]
+  let bufnames = map(bufnrs,'expand("#".v:val.":p")')
+  let setnames = uniq(sort(bufnames))
+  let bufnames = filter(setnames,'!empty(glob(v:val))')
+  let g:changedLines=[]
+  for filex in bufnames
+    echom "FOR filex ".filex
+    echom "buffer ".expand("%")
+    exe "b".filex
+    echom "buffer switched? ".expand("%")
+    exe "b". expand("#".filex.":p:t")
+    echom "buffer switched? now?? ".expand("%")
+
+    let b:baz=expand('#'.filex.':p')
+    exe "b".filex
+    echom "working on file " . b:baz
+    let other_signs = []
+    redir => signs
+      silent execute "sign place file=" . b:baz
+    redir END
+    echom "buffer".expand("%")
+    for sign_line in filter(split(signs, '\n')[2:], 'v:val =~# "="')
+      let components  = split(sign_line)
+      let line_number = str2nr(split(components[0], '=')[1])
+      echom "line nr ".line_number
+      " echom "add line " . getline(line_number)
+      " exe 'caddexpr printf("%s:%d:%s", expand("%"), line("."), "entry")'
+      exe 'caddexpr printf("%s:%d:%s", expand("#".filex.":p:t"), line_number, getline(line_number))'
+      " call add(g:changedLines,getline(line_number))
+      call add(other_signs, line_number)
+    endfor
+"history changes
+    redir => changes
+      silent execute "changes"
+    redir END
+    for change in split(changes, '\n')
+      let components  = split(change)
+      if (len(components)<2)
+        continue
+      endif
+      let line_number = str2nr(components[1])
+      if index(other_signs,line_number)<0
+          exe 'caddexpr printf("%s:%d:%s", expand("#".filex.":p:t"), line_number, getline(line_number))'
+         " call add(g:changedLines, getline(line_number))
+         call add(other_signs,line_number)
+      endif
+    endfor
+  endfor
+  call setqflist(g:changedLines)
+endfunction
+
+
+let g:traceText="OPERA_ERROR"
+let g:markTraceC="false"
+function! MarkTraceAll(expr) range
+  if !empty(a:expr)
+    let l:traceMarkOne="true"
+  else
+    let l:traceMarkOne=""
+  endif
+  let save_cursor = getpos(".")
+  let traceString=GetTraceString()
+  call setpos('.', save_cursor)
+  call inputsave()
+    let l:confirmString = input( " Trace string >" . traceString . "?" )
+  call inputrestore()
+  if !empty(l:confirmString)
+    let traceString=l:confirmString
+  endif
+  echom "start loop 1"
+  let l:counter=0
+  while 1
+    if l:markTraceOne=="true"
+      if l:counter != 0
+        break
+      endif
+      let l:counter=l:counter+1
+    endif
+    let lineMatch=""
+    if (g:markTraceC=="false")
+      let lineMatch=search("^[^ \t#\"].\\{-} \\{-}.::.\\{-}(",'W')
+    else
+      let lineMatch=search("^[^ \t#\"].\\{-} .\\{-}.(",'W')
+    endif
+    echom "got line ".lineMatch
+    if empty(lineMatch)
+      echom "no line found"
+      break
+    endif
+    let methodName=getline(lineMatch)
+    let arg_pos=match(methodName,"(")
+    let output=methodName[0:arg_pos-1]
+    let output=substitute(output,'\/', '', '' )
+    echom "got method " . output
+    " call setpos('.', lineMatch)
+    let bracket=getline(search("^{",'Wz') )
+    echom "got first bracket " . bracket
+    if empty(bracket)
+      echom "no bracket found"
+      break
+    endif
+    " call setpos('.', bracket)
+    " echom "got bracket " . bracket
+    execute 'normal o'
+    execute 'normal a' . "\<Tab>" . traceString . '("xx - ' . output . ' -> START\n");'
+    execute 'normal l'
+    echom "start second while"
+    let l:previousMatch=0
+    let l:bcount=0
+    while 1
+      let l:bcount=l:bcount+1
+
+      let l:endBracket=search("^}\\|return",'Wz')
+      echom "got end bracket >" . l:endBracket . "<"
+      if empty(l:endBracket)
+        echom "no bracket found"
+        break
+      elseif l:endBracket == l:previousMatch+1
+        echom "match on same line"
+        break
+      else
+        let l:previousMatch=l:endBracket
+        let l:methodEnd=getline('.')
+        echom 'got line end '.l:methodEnd
+        " echom "got bracket " . bracket
+        " let l:endBracket=l:endBracket-1
+        " echom "got bracket " . bracket
+        " call setpos('.', (l:endBracket-1))
+        execute 'normal O'
+        execute 'normal a' . "\<Tab>" . traceString . '("xx - ' . output . ' -> END ' . l:bcount . '\n");'
+        execute 'normal l'
+        if matchstr(l:methodEnd,"^}") != ""
+          echom "end of method"
+          break
+        else
+          echom "not end of method " . matchstr(l:methodEnd,"^}")
+        endif
+        let l:endBracket = l:endBracket+1
+        echom "set pos after " . l:endBracket
+        call cursor(l:endBracket,0)
+      endif
+    endwhile
+  endwhile
+endfunction
+
+function! CleanUpTraces()
+  echom "clean up start"
+    let b:baz=expand('%:p')
+    let other_signs = []
+    redir => signs
+      silent execute "sign place file=" . b:baz
+    redir END
+    for sign_line in filter(split(signs, '\n')[2:], 'v:val =~# "="')
+      let components  = split(sign_line)
+      let line_number = str2nr(split(components[0], '=')[1])
+      " echom "add line ".line_number
+      call add(other_signs, line_number)
+    endfor
+"history changes
+    redir => changes
+      silent execute "changes"
+    redir END
+    for change in split(changes, '\n')
+      let components  = split(change)
+      if (len(components)<2)
+        continue
+      endif
+      let line_number = str2nr(components[1])
+      if index(other_signs,line_number)<0
+         " echom "add line ".line_number
+         call add(other_signs,line_number)
+      endif
+    endfor
+    let deleteLines=[]
+    let other_signs = reverse(uniq(sort(copy(other_signs),'n')))
+    for line in other_signs
+      " echo "loop line " . line
+      let lineText=getline(line)
+      " echom "got line " . lineText
+      if matchstr(lineText, "_ERR") != ""
+        execute line.'d'
+        " echom "add remove line " . line
+      endif
+    endfor
 endfunction

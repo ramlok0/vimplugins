@@ -5,7 +5,7 @@ import logging
 import ycm_core
 import re
 
-def FlagsForFile( filename ):
+def FlagsForFilex( filename ):
   return { 'flags': [
     '-Wall',
     '-Wextra',
@@ -85,13 +85,12 @@ def FlagsForFile( filename ):
     '-I', '/home/km000057/GIT/mainline/vobs/Opera_Platform_Linux/GPAL/Devices/include/',
     '-I', '/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/VideoService/include/',
     '-I', '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TConfig/',
-    '-I', '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TStun/Sources/'
-
-    '-isystem', '/usr/include/x86_64-linux-gnu/c++/7',
-    '-isystem', '/usr/include/c++/7',
+    '-I', '/home/km000057/GIT/mainline/vobs/Opera_3rdParty/SipStack/v4_1/M5T/M5TStun/Sources/',
     '-l', 'pthread'
   ] }
 
+    # '-isystem', '/usr/include/x86_64-linux-gnu/c++/7',
+    # '-isystem', '/usr/include/c++/7',
 
 CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 
@@ -351,10 +350,12 @@ def FlagsForInclude(root):
         return None
 
 def FlagsForCompilationDatabase(root, filename):
+    print("xx - Flags for comp db")
     try:
         # Last argument of next function is the name of the build folder for
         # out of source projects
         compilation_db_path = FindNearest(root, 'compile_commands.json', 'build')
+        # compilation_db_path = "/home/km000057/GIT/compile_commands.json"
         compilation_db_dir = os.path.dirname(compilation_db_path)
         logging.info("Set compilation database directory to " + compilation_db_dir)
         compilation_db =  ycm_core.CompilationDatabase(compilation_db_dir)
@@ -371,7 +372,7 @@ def FlagsForCompilationDatabase(root, filename):
     except:
         return None
 
-def FlagsForFilex(filename):
+def FlagsForFile(filename):
     root = os.path.realpath(filename);
     compilation_db_flags = FlagsForCompilationDatabase(root, filename)
     if compilation_db_flags:

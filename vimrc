@@ -30,6 +30,9 @@ colorscheme molokai
 syntax on
 
 "set scrolloff=1
+"TODO REMOVE REMOVE JUST DEBUG
+   " let g:ycm_server_use_vim_stdout = 1
+   " let g:ycm_server_log_level = 'debug'
 
 " show the editing mode on the last line
 set showmode
@@ -61,12 +64,17 @@ set undoreload=500
 set display=lastline
 
 
+" codequery db
+let g:my_db_path="~/GIT/v3r5/"
+"orig let g:my_db_path="~/bin/"
+" usage :CodeQuery 'opton from list' word under cursor
+" similar to \s with cscope
 set tags=~/bin/phones.tag
 exe "cs add " . "/home/km000057/GIT/mainline/vobs/cscope.files" . " " . " "
 " exe "cscope add /home/km000057/phones_GIT/vobs/cscope.files"
 let g:ycm_min_num_of_chars_for_completion = 2
 let g:ycm_auto_trigger = 1
-let g:ycm_collect_identifiers_from_tags_files = 1
+let g:ycm_collect_identifiers_from_tags_files = 0
 let g:ycm_seed_identifiers_with_syntax = 1 " Completion for programming language's keyword
 let g:ycm_complete_in_comments = 1 " Completion in comments
 " let g:ycm_complete_in_strings = 1 " Completion in string
@@ -74,7 +82,8 @@ let g:ycm_add_preview_to_completeopt = 1
 "let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/.ycm_extra_conf.py'
 " turn off syntax checking
-let g:ycm_show_diagnostics_ui = 0
+" change
+" let g:ycm_show_diagnostics_ui = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_key_list_select_completion = ['<TAB>','<Down>']
 let g:ycm_key_list_previous_completion=['<Up>']
@@ -167,13 +176,14 @@ noremap <C-x> :FZFMru<CR>
 " noremap <C-h> :call GetGitFolder("$HOME/GIT/")<CR>
 if has("gui_running")
   noremap <C-h> :call BrowseFolderGui("$HOME/GIT/")<CR>
-  noremap <C-j> :call BrowseFolderGui(g:lastSearch)<CR>
+  noremap <C-j> :call BrowseFolderGui(expand('%:p:h'))<CR>
 else
   noremap <C-h> :call BrowseFolder("$HOME/GIT")<CR>
-  noremap <C-j> :call BrowseFolder(g:lastSearch)<CR>
+  noremap <C-j> :call BrowseFolder(expand('%:p:h'))<CR>
 endif
 " noremap <C-j> :call GetLastGitFiles()<CR>
-let g:traceText = "OPERA_ERROR"
+let g:traceText = "printf"
+" let g:traceText = "OPERA_ERROR"
 noremap <C-l> :call InsertMethodTrace()<CR>
 " noremap <C-f> :Files ~/phones_GIT/vobs/<CR>
 let g:CommandTFileScanner="find"
@@ -207,6 +217,18 @@ nmap <C-Down> ]e
 vmap <C-Up> [egv
 vmap <C-Down> ]egv
 
+
+nnoremap <silent> ,ld :LspDefinition<CR>
+nnoremap <silent> ,lh :LspHover<CR>
+nnoremap <silent> ,ls :LspReferences<CR>
+nnoremap <silent> ,lc :LspCqueryCallers<CR>
+" rename files from quicfix window
+nnoremap <silent> ,qr :call QfToRename()<CR>
+nnoremap <silent> ,qf :CodeQueryFilter !  
+
+nnoremap <silent> ,cs :CodeQuery Symbol<CR>
+nnoremap <silent> ,cc :CodeQuery Call<CR>
+nnoremap <silent> ,cd :CodeQuery Definition<CR>
 "nnoremap <silent> ,cc :call ToggleComment()<CR>
 "vnoremap <silent> ,cu :call ToggleComment()<CR>
 " noremap  <silent> ,cc :call ToggleComment()<CR>
@@ -240,6 +262,8 @@ augroup END
 let &errorformat="%f:%l:%c: %t%*[^:]:%m,%f:%l: %t%*[^:]:%m," . &errorformat
 set errorformat-=%f:%l:%m
 set errorformat-=%f:%l:\ %t%*[^:]:%m
+"v3r5 build message
+set errorformat+=%f:%l:\ error:\ %m
 let g:asyncrun_auto = "make"
 
 let g:asyncrun_status = ''
@@ -473,3 +497,41 @@ augroup _fzf
 augroup END
 
 let $FZF_DEFAULT_COMMAND = 'rg --files --follow -g "!{.git,node_modules}/*" 2>/dev/null'
+
+if executable('cquery')
+   au User lsp_setup call lsp#register_server({
+      \ 'name': 'cquery',
+      \ 'cmd': {server_info->['cquery']},
+      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      \ 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' },
+      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+      \ })
+ endif
+
+
+" let g:ycm_register_as_syntastic_checker = 1 "default 1
+" let g:Show_diagnostics_ui = 1 "default 1
+" 
+" "will put icons in Vim's gutter on lines that have a diagnostic set.
+" "Turning this off will also turn off the YcmErrorLine and YcmWarningLine
+" "highlighting
+" let g:ycm_enable_diagnostic_signs = 1
+" let g:ycm_enable_diagnostic_highlighting = 0
+" let g:ycm_always_populate_location_list = 1 "default 0
+" let g:ycm_open_loclist_on_ycm_diags = 1 "default 1
+" 
+" 
+" let g:ycm_collect_identifiers_from_tags_files = 1 "default 0
+" 
+" 
+" let g:ycm_server_use_vim_stdout = 0 "default 0 (logging to console)
+" let g:ycm_server_log_level = 'info' "default info
+" 
+" 
+" let g:ycm_global_ycm_extra_conf = '~/.ycm_extra_conf.py'  "where to search for .ycm_extra_conf.py if not found
+" let g:ycm_confirm_extra_conf = 1
+" 
+" 
+" let g:ycm_goto_buffer_command = 'same-buffer' "[ 'same-buffer', 'horizontal-split', 'vertical-split', 'new-tab' ]
+" let g:ycm_filetype_whitelist = { '*': 1 }
+" 

@@ -14,6 +14,20 @@ sudo dpkg -i fd.....deb
 ignore tags and changes in submodules
 git config -f .gitmodules submodule.YankRing.vim.ignore untracked
 
+####
+ pip install scan-build --user
+build compilation params file
+  .local/bin/intercept-build ~/bin/buildBind.sh mainline 34
+ .local/bin/intercept-build ~/bin/buildBind.sh mainline 34
+
+ .local/bin/intercept-build ~/bin/buildBind.sh mainline 34 sip 1
+
+put it in ~/GIT/ directory
+- replace vagrant with home
+- "-funwind-tables", g/"-funwind-tables"/d
+- replace  all "-D", "sdsfdsd" with "-Dsdsfdsd"
+- for v3r5 g/"--sysroot\//d - remove all sysroot path - it breaks path for system includes
+######
 
 let g:ycm_global_ycm_extra_conf = 'path to .ycm_extra_conf.py'
 
