@@ -5,6 +5,7 @@ endif
 filetype plugin on
 
 
+set clipboard=unnamedplus
 execute pathogen#infect()
 
 let g:quickr_cscope_autoload_db = 0
@@ -12,12 +13,23 @@ let g:quickr_cscope_autoload_db = 0
 "set viminfo^=!
 " % - restores buffers between sessions
 "set viminfo=!,%,<800,'10,/50,:100,h,f0,n~/.vim/cache/.viminfo
-set viminfo=!,<800,'10,/50,:100,h,f0,n~/.vim/cache/.viminfo
+if !has('nvim')
+  set viminfo=!,<800,'10,/50,:100,h,f0,n~/.vim/cache/.viminfo
+elseif has('nvim')
+  set viminfo=!,<800,'10,/50,:100,h,f0,n~/.config/nvim/cache/.viminfo
+endif
 set cursorline
 set cursorcolumn
 
+" let g:clighter8_libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
+
 "allow you to move freely in visual block mode
 set virtualedit=block
+
+
+" autopair - do not jump do end pair 
+let g:AutoPairsMultilineClose=0
+
 
 let g:rainbow_active = 1
 "colorscheme desert
@@ -65,7 +77,7 @@ set display=lastline
 
 
 " codequery db
-let g:my_db_path="~/GIT/v3r5/"
+let g:my_db_path="~/GIT/mainline/"
 "orig let g:my_db_path="~/bin/"
 " usage :CodeQuery 'opton from list' word under cursor
 " similar to \s with cscope
@@ -182,7 +194,7 @@ else
   noremap <C-j> :call BrowseFolder(expand('%:p:h'))<CR>
 endif
 " noremap <C-j> :call GetLastGitFiles()<CR>
-let g:traceText = "printf"
+let g:defaultTraceText = "printf"
 " let g:traceText = "OPERA_ERROR"
 noremap <C-l> :call InsertMethodTrace()<CR>
 " noremap <C-f> :Files ~/phones_GIT/vobs/<CR>
@@ -216,6 +228,9 @@ nmap <C-Down> ]e
 " bubble selected lines
 vmap <C-Up> [egv
 vmap <C-Down> ]egv
+
+nnoremap <C-PageUp> gt
+nnoremap <C-PageUp> gT
 
 
 nnoremap <silent> ,ld :LspDefinition<CR>
@@ -535,3 +550,4 @@ if executable('cquery')
 " let g:ycm_goto_buffer_command = 'same-buffer' "[ 'same-buffer', 'horizontal-split', 'vertical-split', 'new-tab' ]
 " let g:ycm_filetype_whitelist = { '*': 1 }
 " 
+set clipboard=unnamedplus

@@ -33,6 +33,20 @@ let g:ycm_global_ycm_extra_conf = 'path to .ycm_extra_conf.py'
 
 let g:ycm_global_ycm_extra_conf = 'path to .ycm_extra_conf.py'
 
+#####
+clighter 
+sudo apt-getisntall libclang1... python-clang-... same version
+add to vimrc let g:clighter8_libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
+
+
+######
+cquery
+
+llvm-config --prefix --version
+clang --version
+should be the same
+
+
 def FlagsForFile(filename, **kwargs):
   return { 'flags': ['-I/usr/include', '-std=gnu89', '-xc'] }
 

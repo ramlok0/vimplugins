@@ -64,7 +64,7 @@ function! TraceShowSipWith(expr)
     echom "hhh"
     echom a:expr
     setl foldmethod=expr
-    setlocal foldexpr=(((getline(v:lnum)=~'.*(\\d\\{3,4}):.*$')\|\|(getline(v:lnum-1)=~'.*(\\d\\{3,4}):.*$')\|\|(getline(v:lnum+1)=~'.*(\\d\\{3,4}):.*$'))\&\&(getline(v:lnum)!~'error\\\|warning\\\|invalid\\\|fail')\&\&((getline(v:lnum)!~a:expr)\&\&(getline(v:lnum-1)!~a:expr)\&\&(getline(v:lnum+1)!~a:expr))\|\|(getline(v:lnum)=~'^$'))?1:0 foldmethod=expr
+    setlocal foldexpr=(((getline(v:lnum)=~'.*(\\d\\{3,4}):.*$')\|\|(getline(v:lnum-1)=~'.*(\\d\\{3,4}):.*$')\|\|(getline(v:lnum+1)=~'.*(\\d\\{3,4}):.*$'))\&\&((getline(v:lnum)!~'error\\\|warning\\\|invalid\\\|fail')\&\&(getline(v:lnum-1)!~'error\\\|warning\\\|invalid\\\|fail'))\&\&((getline(v:lnum)!~a:expr)\&\&(getline(v:lnum-1)!~a:expr)\&\&(getline(v:lnum+1)!~a:expr))\|\|(getline(v:lnum)=~'^$'))?1:0 foldmethod=expr
 
 
     setl foldminlines=0
@@ -255,14 +255,14 @@ function! GetTraceString()
     return g:traceString
   endif
   let l:traceString=get(g:traceStringFound,expand('%'))
-  echom "previous match? ".l:traceString." ".empty(l:traceString)."<"
+  " echom "previous match? ".l:traceString." ".empty(l:traceString)."<"
   if empty(l:traceString)
     let save_cursor = getpos(".")
     let searchStringPattern="OPERA_.\\{-}(\\|SG_.\\{-}(\\|VCR_.\\{-}\\|GA_.\\{-}("
     let l:traceString=getline(search(l:searchStringPattern ))
     " echom "got line ". l:traceString
     let traceType=matchstr(l:traceString,"OPERA\\|SG\\|VCR\\|GA")
-    echom "got trace ". traceType
+    " echom "got trace ". traceType
     if traceType == "OPERA"
       let l:traceString="OPERA_ERROR"
     elseif traceType=="SG"
@@ -276,7 +276,7 @@ function! GetTraceString()
     if !empty(l:traceString)
       let g:traceStringFound[expand('%:t')]=l:traceString
     else
-      let l:traceString=g:traceText
+      let l:traceString=g:defaultTraceText
     endif
     call setpos('.', save_cursor)
   endif
@@ -293,6 +293,19 @@ endfunction
 "http://ricostacruz.com/cheatsheets/vimscript
 let g:traceStringFound={}
 function! InsertMethodTrace()
+  let l:currentWord = expand("<cword>")
+  if len(l:currentWord) < 3
+    let l:currentWord = ""
+  endif
+  call inputsave()
+    let l:param = input( "trace param: <" . l:currentWord . "> " )
+  call inputrestore()
+  if empty(l:param)
+    let l:param=l:currentWord
+  elseif len(l:param) == 1
+    let l:param=""
+  endif
+  " echom ">>".len(l:param)
   let l:traceString=GetTraceString()
   let save_cursor = getpos(".")
   " match only c++ ::methods
@@ -301,14 +314,25 @@ function! InsertMethodTrace()
   let arg_pos=match(methodName,"(")
   let output=methodName[0:arg_pos-1]
   let output=substitute(output,'\/', '', '' )
-"""  call append(str2nr(lnum),"\tOPERA_ERROR(\"xx - " . xxx . " -> \")" )
+"""  call append(str2nr(lnum),"\tOPERA_ERROR( \"xx - " . xxx . " -> \" )" )
   call setpos('.', save_cursor)
+  let curLine = getpos(".")[1:1]
+  let curLine = curLine[0]
+  let line=getline(curLine+1)
+  " if matchstr(line,'^{') != ""
+  " if matchstr(line,"^\\s\\?{") != ""
+  if !empty(matchstr(line,"^\\s\\{-}{"))
+    call cursor(curLine+1,0)
+  endif
   execute 'normal o'
   "test GW_ERROR(
   "execute 'normal a' . "\<Tab>" . g:traceText . "(\"xx - " . xxx . " -> \\n\");"
   " execute 'silent s/\v^(\s*)/\1' . g:traceText . '(\"xx - ' . output . ' -> \\n\");'
-  execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> \n");'
-
+  if empty(l:param) || l:param==""
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> \n");'
+  else
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> ' . l:param . ' %i \n",' . l:param . ');'
+  endif
   " execute 'normal a' . g:traceText . "(\"xx - " . output . " -> \\n\");"
    execute 'normal l'
 "   startinsert
@@ -740,7 +764,8 @@ function! SearchAndReplace()
  " echo l:currentWord
  " echo "eeee" .  l:currentWord
 "  call feedkeys("iHello\<CR>Universe!")
-  call feedkeys(":,$s/" . l:currentWord ."//gc","t")
+  exe "OverCommandLine ,$s/" . l:currentWord ."//gc"
+  " call feedkeys(":,$s/" . l:currentWord ."//gc","t")
 
 endfunction
 
@@ -784,17 +809,13 @@ function! SearchAndReplacev() range
   endif
   let replacement=""
   call inputsave()
-  if (line_start != line_end )
-    let a:searchString = input('Enter search string:')
-    let a:replacement = ""
-  else
-    let a:replacement = input('Enter replacement:')
-    let a:searchString = line0[column_start - 1: column_start + l:width]
-  endif
+  let a:replacement = input('Enter replacement:')
+  let a:searchString = line0[column_start - 1: column_start + l:width]
   call inputrestore()
   echom "xxx>".replacement
 "   " let l:currentWord = substitute(@*, '\n', '', 'g')
-  call feedkeys(":,$s/" . a:searchString . "/" . a:replacement ."/gc","t")
+  exe "OverCommandLine ,$s/" . a:searchString . "/" . a:replacement ."/gc"
+  " call feedkeys(":,$s/" . a:searchString . \"/" . a:replacement ."/gc","t")
 endfunction
 
 "replace string in block or multiline with string
@@ -829,7 +850,7 @@ function! SearchandreplaceBlock() range
     echom "Replace for : " . join(linesuniq," <> ")
     let inputStr = "Enter replacement params(s) " . len(linesuniq). ": "
     call inputsave()
-      let a:replacement = input( inputStr )
+      let a:replacement = join(split(input( inputStr )),",")
     call inputrestore()
     if len(linesuniq) == 1
       let searchstring = linesuniq[0]
@@ -1289,7 +1310,9 @@ function! SearchBuffers(expr)
     return
   endif
   let searchTerm = substitute( searchTerm, " ","\\\\ ", "g")
-  exe "Back! -Q " . searchTerm
+  echom "Search term " . searchTerm
+  " exe "Back! -Q " . searchTerm
+  exe "Back! " . searchTerm
 endfunction
 
 
@@ -1368,6 +1391,8 @@ function! UploadFw()
   endif
   " let nrOfErrors=len(filter(getqflist(),'v:val.valid'))
   " let nrOfErrors=len(filter(getqflist(),'matchstr(v:val.text,"error") != ""'))
+  let errors=filter(getqflist(),'matchstr(v:val.text,"\\CError") != "" || matchstr(v:val.text,"error:") != ""')
+  echom join(errors)
   let nrOfErrors=len(filter(getqflist(),'matchstr(v:val.text,"\\CError") != "" || matchstr(v:val.text,"error:") != ""'))
   echom "nr of errors " . nrOfErrors
   if g:asyncrun_code == 0 && nrOfErrors == 0
@@ -1541,13 +1566,15 @@ function! ShowAllChanges()
 endfunction
 
 
-let g:traceText="OPERA_ERROR"
+" let g:traceText="OPERA_ERROR"
 let g:markTraceC="false"
 function! MarkTraceAll(expr) range
+  call Multiple_cursors_before()
+  let l:markTraceOne=""
   if !empty(a:expr)
-    let l:traceMarkOne="true"
+    let l:markTraceOne="true"
   else
-    let l:traceMarkOne=""
+    let l:markTraceOne=""
   endif
   let save_cursor = getpos(".")
   let traceString=GetTraceString()
@@ -1632,6 +1659,7 @@ function! MarkTraceAll(expr) range
       endif
     endwhile
   endwhile
+  call Multiple_cursors_after()
 endfunction
 
 function! CleanUpTraces()
@@ -1673,4 +1701,78 @@ function! CleanUpTraces()
         " echom "add remove line " . line
       endif
     endfor
+endfunction
+
+
+" speed up multiple cursor search with youcompleteme plugin
+function! Multiple_cursors_before()
+  let s:old_ycm_whitelist = g:ycm_filetype_whitelist
+  let g:ycm_filetype_whitelist = {}
+  call youcompleteme#DisableCursorMovedAutocommands()
+endfunction
+
+function! Multiple_cursors_after()
+  call youcompleteme#EnableCursorMovedAutocommands()
+  let g:ycm_filetype_whitelist = s:old_ycm_whitelist
+endfunction
+
+function! CreateHeader()
+  let basename = expand("%:t:r")
+  let includeGuard = '__' . basename . '_h__'
+  call append(0, "#ifndef " . includeGuard)
+  call append(1, "#define " . includeGuard)
+  call append(line("$"), "#endif /* !" . includeGuard . " */")
+endfunction
+
+function! CreateClass()
+  let l:currentWord = expand("<cword>")
+  let l:currentLine=line(".")
+  " echom "curr line " . l:currentLine
+  call append(l:currentLine + 1, "class " . l:currentWord)
+  call append(l:currentLine + 2, "{")
+  call append(l:currentLine + 3, "  public:")
+  call append(l:currentLine + 4, "    " . l:currentWord . "( ) { };")
+  call append(l:currentLine + 5, "    ~" . l:currentWord . "( ) { };")
+  call append(l:currentLine + 6, "};")
+endfunction
+
+function! CreateMain()
+  call append(1, "#include \"stdio.h\"")
+  call append(2, "#include \"iostream\"")
+  call append(3, "#include \"vector\"")
+  call append(5, "")
+  call append(6, "int main()")
+  call append(7, "{")
+  call append(8, "printf(\"xx - start\\n\");")
+  call append(9, "printf(\"xx - end\\n\");")
+  call append(10, "}")
+endfunction
+
+function! CreateSetGet()
+  let l:memberVariable = expand("<cword>")
+  let l:type = getline(".")
+  " echom "type " . l:type
+  let l:typeList = split(l:type)
+  let listLen = len(l:typeList)
+  " echom "size " . listLen
+  if (listLen > 1)
+    let l:typeList = l:typeList[0:listLen-2]
+    let l:type = join(l:typeList, " ")
+  endif
+  " echom "type list  " . l:type
+  let l:variable = l:memberVariable
+  let l:currentLine=line(".")
+  " echom "variable " . l:variable
+  if (l:variable=~"^m\\u.*")
+    " echom "xx - mathc on m"
+    let l:variable = strpart(l:variable,1)
+    let l:variableLower = tolower(l:variable)
+  " if (strpart(l:variable,0,1) == '_')
+  elseif (l:variable=~"^m_.*")
+    " echom "xx - mathc on m_"
+    let l:variable = toupper(strpart(l:variable,2,1)) . strpart(l:variable,3)
+    let l:variableLower = tolower(l:variable)
+  endif
+  call append(l:currentLine + 1, l:type . " get" . l:variable . "( ) { return " . l:memberVariable . "; };")
+  call append(l:currentLine + 2, "void set" . l:variable . "( " . l:type . " value ) { " . l:memberVariable . " = value; };")
 endfunction
