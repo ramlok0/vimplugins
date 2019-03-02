@@ -19,9 +19,6 @@
 [submodule "vim-better-whitespace"]
 	path = vim-better-whitespace
 	url = https://github.com/ntpeters/vim-better-whitespace.git
-[submodule "vim-colors-solarized"]
-	path = vim-colors-solarized
-	url = https://github.com/altercation/vim-colors-solarized.git
 [submodule "vim-fswitch"]
 	path = vim-fswitch
 	url = https://github.com/derekwyatt/vim-fswitch.git
@@ -45,21 +42,12 @@
 [submodule "vim-fugitive-blame-ext"]
 	path = vim-fugitive-blame-ext
 	url = https://github.com/tommcdo/vim-fugitive-blame-ext.git
-[submodule "vim-unimpaired"]
-	path = vim-unimpaired
-	url = https://github.com/tpope/vim-unimpaired.git
 [submodule "fzf.vim"]
 	path = fzf.vim
 	url = https://github.com/junegunn/fzf.vim.git
 [submodule "vim-multiple-cursors"]
 	path = vim-multiple-cursors
 	url = https://github.com/terryma/vim-multiple-cursors.git
-[submodule "nerdtree"]
-	path = nerdtree
-	url = https://github.com/scrooloose/nerdtree.git
-[submodule "vim-mundo"]
-	path = vim-mundo
-	url = https://github.com/simnalamburt/vim-mundo.git
 [submodule "vim-exchange"]
 	path = vim-exchange
 	url = https://github.com/tommcdo/vim-exchange.git
@@ -77,9 +65,6 @@
 	path = YankRing.vim
 	url = https://github.com/vim-scripts/YankRing.vim.git
 	ignore = untracked
-[submodule "ultisnips"]
-	path = ultisnips
-	url = https://github.com/SirVer/ultisnips.git
 [submodule "vim-snippets"]
 	path = vim-snippets
 	url = https://github.com/honza/vim-snippets.git
@@ -104,9 +89,6 @@
 [submodule "fzf-mru.vim"]
 	path = fzf-mru.vim
 	url = https://github.com/pbogut/fzf-mru.vim.git
-[submodule "LeaderF"]
-	path = LeaderF
-	url = https://github.com/Yggdroot/LeaderF.git
 [submodule "ctrlsf.vim"]
 	path = ctrlsf.vim
 	url = https://github.com/dyng/ctrlsf.vim.git
@@ -146,3 +128,9 @@
 [submodule "agit.vim"]
 	path = agit.vim
 	url = https://github.com/cohama/agit.vim.git
+[submodule "nerdtree"]
+	path = nerdtree
+	url = https://github.com/scrooloose/nerdtree.git
+[submodule "vim-mundo"]
+	path = vim-mundo
+	url = https://github.com/simnalamburt/vim-mundo.git

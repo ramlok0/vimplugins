@@ -1,4 +1,13 @@
+how to setup Plug
 
+ curl -fLo ~/.vim/autoload/plug.vim --create-dirs     https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+
+Plug 'Valloric/YouCompleteMe.git', { 'for': 'cpp' }
+Plug '~/.vim/bundle/YouCompleteMe', { 'for': 'cpp' } ; unmanaged
+
+
+####################################
 git clone https://github.com/ramlok0/vimplugins
 git submodule update --init --recursive
 

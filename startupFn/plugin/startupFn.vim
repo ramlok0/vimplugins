@@ -408,7 +408,7 @@ function! BrowseFolderGui(expr)
   let a:search=a:expr
   if a:search == "" || a:search == "." || len(a:search) < 10
     echom "weird a:search" . a:search
-    let a:search="/home/km000057/GIT/"
+    let a:search="~/"
   endif
   if g:searchFor == "dir"
     " echom "search dir"
@@ -1497,12 +1497,18 @@ endfunction
 
 
 function! SetTags(expr)
-  echom "Path " . a:expr
+  "path to git (mainline) folder
+  " echom "Set tag path to" . a:expr
   let g:tagPath=a:expr . "/phones.tag" 
-  exe "set tags=" . g:tagPath
-  exe "cs kill cscope.files"
-  exe "cs add " . a:expr . "/vobs/cscope.files" . " " . " "
-  exe "cs reset"
+  if filereadable(expand(g:tagPath))
+    exe "set tags=" . g:tagPath
+  endif
+  let l:csPath = a:expr . "/vobs/cscope.files"
+  if filereadable(expand(l:csPath))
+    exe "cs kill cscope.files"
+    exe "cs add " . a:expr . "/vobs/cscope.files" . " " . " "
+    exe "cs reset"
+  endif
   let g:my_db_path=a:expr. "/"
 endfunction
 

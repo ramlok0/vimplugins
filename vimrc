@@ -6,8 +6,54 @@ filetype plugin on
 
 
 set clipboard=unnamedplus
-execute pathogen#infect()
-
+" execute pathogen#infect()
+call plug#begin('~/.vim/bundle')
+Plug 'vim-scripts/YankRing.vim'
+Plug 'junegunn/fzf.git'
+Plug '~/.vim/bundle/molokai'
+" Plug 'tomasr/molokai.git' " now it's ok in plug menu...but it won't update
+Plug 'simnalamburt/vim-mundo.git', { 'on': 'MundoToggle' }
+Plug 'ronakg/quickr-cscope.vim.git'
+Plug 'majutsushi/tagbar.git', { 'for': 'cpp' }
+Plug 'vim-airline/vim-airline.git'
+Plug 'ntpeters/vim-better-whitespace.git'
+Plug 'derekwyatt/vim-fswitch.git'
+Plug 'airblade/vim-gitgutter.git'
+Plug 'tpope/vim-sleuth'
+Plug 'vim-scripts/VisIncr'
+Plug 'Valloric/YouCompleteMe.git', { 'for': 'cpp' }
+Plug 'tpope/vim-fugitive.git'
+Plug 'tommcdo/vim-fugitive-blame-ext.git'
+Plug 'junegunn/fzf.vim.git'
+Plug 'terryma/vim-multiple-cursors.git'
+Plug 'scrooloose/nerdtree.git', { 'on': 'NERDTreeToggle' }
+Plug 'tommcdo/vim-exchange.git'
+Plug 'tpope/vim-abolish.git'
+Plug 'skywind3000/asyncrun.vim.git'
+Plug 'ramele/agrep.git'
+Plug 'rdnetto/YCM-Generator.git', { 'for': 'cpp' }
+Plug 'wellle/targets.vim.git'
+Plug 'junegunn/vim-easy-align.git'
+Plug 'rhysd/clever-f.vim.git'
+Plug 'tpope/vim-surround.git'
+Plug 'adelarsq/vim-matchit.git'
+Plug 'pbogut/fzf-mru.vim.git'
+Plug 'dyng/ctrlsf.vim.git', { 'on': 'CtrlSF' }
+Plug 'brooth/far.vim.git'
+Plug 'will133/vim-dirdiff.git'
+Plug 'mh21/errormarker.vim.git'
+Plug 'wincent/ferret.git'
+Plug 'devjoe/vim-codequery.git', { 'for': 'cpp' }
+Plug 'prabirshrestha/vim-lsp.git', { 'for': 'cpp' }
+Plug 'pdavydov108/vim-lsp-cquery.git', { 'for': 'cpp' }
+Plug 'prabirshrestha/async.vim.git'
+Plug 'osyo-manga/vim-over.git'
+Plug 'jiangmiao/auto-pairs.git'
+Plug 'jremmen/vim-ripgrep.git'
+Plug 'cohama/agit.vim.git'
+Plug '~/.vim/bundle/startupFn'
+call plug#end()
+ ,
 let g:quickr_cscope_autoload_db = 0
 "allows Highlight plugin to save conf
 "set viminfo^=!
@@ -81,8 +127,31 @@ let g:my_db_path="~/GIT/mainline/"
 "orig let g:my_db_path="~/bin/"
 " usage :CodeQuery 'opton from list' word under cursor
 " similar to \s with cscope
-set tags=~/bin/phones.tag
-exe "cs add " . "/home/km000057/GIT/mainline/vobs/cscope.files" . " " . " "
+"
+"
+" rules for loading tags
+"
+let g:currentTagFilePath=""
+" autocmd BufReadPost,BufWinEnter *.cpp :call LoadTags()
+autocmd BufWinEnter *.cpp :call LoadTags()
+function! LoadTags()
+  " echom "xxx"
+  " echom expand('%:p:h')
+  let l:path = expand('%:p:h')
+  let l:path = substitute(l:path,'vobs.*','','')
+  if (g:currentTagFilePath != l:path )
+    let g:currentTagFilePath = l:path
+    call SetTags(l:path)
+  endif
+endfunction
+
+" if filereadable(expand("~/bin/phones.tag"))
+  " set tags=~/bin/phones.tag
+" endif
+" 
+" if filereadable(expand("~/GIT/mainline/"))
+  " exe "cs add " . "/home/km000057/GIT/mainline/vobs/cscope.files" . " " . " "
+" endif
 " exe "cscope add /home/km000057/phones_GIT/vobs/cscope.files"
 let g:ycm_min_num_of_chars_for_completion = 2
 let g:ycm_auto_trigger = 1
@@ -209,6 +278,7 @@ nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F5> :FSSplitLeft<CR>
 nmap <F4> :AirlineToggleWhitespace<CR>
 nmap <F1> :AsyncRun uploadFw.py mainline 120 121
+nmap <F10> :YRShow<CR>
 ":AsyncRun buildParse.sh mainline 34 sip 1
 
 " nmap <F2> :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 9<CR>
@@ -232,6 +302,12 @@ vmap <C-Down> ]egv
 nnoremap <C-PageUp> gt
 nnoremap <C-PageUp> gT
 
+" new window
+nnoremap <silent> ,nn :enew<CR>
+nnoremap <silent> ,ne :enew<CR>
+
+nnoremap <silent> ,yr :YRShow<CR>
+nnoremap <silent> ,yy :YRShow<CR>
 
 nnoremap <silent> ,ld :LspDefinition<CR>
 nnoremap <silent> ,lh :LspHover<CR>
