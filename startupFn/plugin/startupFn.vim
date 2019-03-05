@@ -1339,13 +1339,28 @@ function! SearchPath(expr)
   call feedkeys(":Ack! -Q " . searchTerm . " " . currentPath,"t")
 endfunction
 
+
+function! UploadLoadware()
+  if (!empty(g:targetPhones))
+    let l:phoneNr = g:targetPhones
+  else
+    let l:phoneNr = "121"
+  endif
+  let folder=expand('%:p:h')
+  let l:gitFolder = matchstr(folder,'km000057/.\{-}/\zs.\{-}\ze/')
+  call feedkeys(":AsyncRun uploadFw.py " . l:gitFolder . " " . l:phoneNr)
+endfunction
+
 " all scripts exit with make exit code (vagrant->local buildScript -> asyncRes
 " code)
 let g:gitfolder="mainline"
 function! BuildBind(expr)
   call inputsave()
-    let l:target = input( "targetPhones? " . g:targetPhones . "?" )
+    let l:target = input( "targetPhones? (x to cancel)" . g:targetPhones . "?" )
   call inputrestore()
+  if (l:target == "x")
+    return
+  endif
   if !empty(l:target)
     let g:targetPhones=l:target
   endif
@@ -1782,3 +1797,22 @@ function! CreateSetGet()
   call append(l:currentLine + 1, l:type . " get" . l:variable . "( ) { return " . l:memberVariable . "; };")
   call append(l:currentLine + 2, "void set" . l:variable . "( " . l:type . " value ) { " . l:memberVariable . " = value; };")
 endfunction
+
+
+" function! MyBalloonExpr()
+  " call timer_start(0, {t->0})
+  " if exists(':LspHover')
+    " echom "call lsp hover"
+    " " call lsp#ui#vim#hover#get_hover_under_cursor()
+    " execute "LspHover"
+    " return "hover"
+  " else
+        " return 'Cursor is at line ' . v:beval_lnum .
+                " \', column ' . v:beval_col .
+                " \ ' of file ' .  bufname(v:beval_bufnr) .
+                " \ ' on word "' . v:beval_text . '"'
+" endfunction
+" set bexpr=MyBalloonExpr()
+" set ballooneval
+" set bevalterm
+

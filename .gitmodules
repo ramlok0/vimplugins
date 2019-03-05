@@ -134,3 +134,6 @@
 [submodule "vim-mundo"]
 	path = vim-mundo
 	url = https://github.com/simnalamburt/vim-mundo.git
+[submodule "vim-cpp-enhanced-highlight"]
+	path = vim-cpp-enhanced-highlight
+	url = https://github.com/octol/vim-cpp-enhanced-highlight.git
