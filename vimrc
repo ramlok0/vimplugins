@@ -7,20 +7,28 @@ filetype plugin on
 set clipboard=unnamedplus
 " execute pathogen#infect()
 call plug#begin('~/.vim/bundle')
+" Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'vim-scripts/YankRing.vim'
 Plug 'junegunn/fzf.git'
 Plug '~/.vim/bundle/molokai'
+Plug 'zefei/vim-colortuner.git', { 'on': 'Colortuner' }
+Plug 'xolox/vim-notes.git'
+Plug 'xolox/vim-misc.git'
+Plug 'markonm/traces.vim'
+Plug 'justinmk/vim-sneak'
+Plug 'autozimu/LanguageClient-neovim'
 " Plug 'tomasr/molokai.git' " now it's ok in plug menu...but it won't update
 Plug 'simnalamburt/vim-mundo.git', { 'on': 'MundoToggle' }
 Plug 'ronakg/quickr-cscope.vim.git'
 Plug 'octol/vim-cpp-enhanced-highlight.git', { 'for': 'cpp' } "maybe I am ok with just c.vim in .vim/syntax
+Plug 'severin-lemaignan/vim-minimap', { 'on': 'Minimap' }
 Plug 'majutsushi/tagbar.git', { 'for': 'cpp' }
 Plug 'vim-airline/vim-airline.git'
+Plug '~/.vim/bundle/highlight'
 Plug 'ntpeters/vim-better-whitespace.git'
 Plug 'derekwyatt/vim-fswitch.git'
 Plug 'airblade/vim-gitgutter.git'
 Plug 'tpope/vim-sleuth'
-Plug 'vim-scripts/VisIncr'
 Plug 'Valloric/YouCompleteMe.git', { 'for': 'cpp' }
 Plug 'tpope/vim-fugitive.git', { 'on': 'Gdiff' }
 Plug 'tommcdo/vim-fugitive-blame-ext.git', { 'on': 'Gblame' }
@@ -30,7 +38,7 @@ Plug 'scrooloose/nerdtree.git', { 'on': 'NERDTreeToggle' }
 Plug 'tommcdo/vim-exchange.git'
 Plug 'tpope/vim-abolish.git'
 Plug 'skywind3000/asyncrun.vim.git'
-Plug 'ramele/agrep.git'
+Plug 'ramele/agrep.git', { 'on': 'Agrep' }
 Plug 'rdnetto/YCM-Generator.git', { 'for': 'cpp' }
 Plug 'wellle/targets.vim.git'
 Plug 'junegunn/vim-easy-align.git'
@@ -39,8 +47,8 @@ Plug 'tpope/vim-surround.git'
 Plug 'adelarsq/vim-matchit.git'
 Plug 'pbogut/fzf-mru.vim.git'
 Plug 'dyng/ctrlsf.vim.git', { 'on': 'CtrlSF' }
-Plug 'brooth/far.vim.git'
-Plug 'will133/vim-dirdiff.git'
+Plug 'brooth/far.vim.git', { 'on': 'Far' }
+Plug 'will133/vim-dirdiff.git', { 'on': 'DirDiff' }
 Plug 'mh21/errormarker.vim.git'
 Plug 'wincent/ferret.git'
 Plug 'devjoe/vim-codequery.git', { 'for': 'cpp' }
@@ -52,7 +60,7 @@ Plug 'prabirshrestha/async.vim.git'
 Plug 'osyo-manga/vim-over.git'
 Plug 'jiangmiao/auto-pairs.git'
 Plug 'jremmen/vim-ripgrep.git'
-Plug 'cohama/agit.vim.git'
+Plug 'cohama/agit.vim.git', { 'on': 'Agit' }
 Plug '~/.vim/bundle/startupFn'
 call plug#end()
  ,
@@ -122,6 +130,20 @@ set undoreload=500
 set display=lastline
 
 
+let g:LanguageClient_serverCommands = {
+    \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'cpp': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'cuda': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
+    \ }
+
+let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
+" let g:LanguageClient_settingsPath = '/home/YOUR_USERNAME/.config/nvim/settings.json'
+" https://github.com/autozimu/LanguageClient-neovim/issues/379 LSP snippet is not supported
+let g:LanguageClient_hasSnippetSupport = 0
+
+" sneak config
+let g:sneak#label = 1
 " codequery db
 let g:my_db_path="~/GIT/mainline/"
 "orig let g:my_db_path="~/bin/"
@@ -170,6 +192,15 @@ if executable('cquery')
       \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
       \ })
 endif
+" if executable('ccls')
+   " au User lsp_setup call lsp#register_server({
+      " \ 'name': 'ccls',
+      " \ 'cmd': {server_info->['ccls']},
+      " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      " \ 'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }},
+      " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+      " \ })
+" endif
 " if filereadable(expand("~/bin/phones.tag"))
   " set tags=~/bin/phones.tag
 " endif
@@ -203,6 +234,14 @@ let g:ycm_autoclose_preview_window_after_completion = 0
 "" SNIPETS
 nnoremap ,hfor :-1read $HOME/.vim/bundle/after/snippets/for.txt<CR>f(a
 
+let g:notes_directories = ['~/doc/vimNotes', '~/doc/vimNotes']
+
+let g:hopping#keymapping = {
+\	"\<C-n>" : "<Over>(hopping-next)",
+\	"\<C-p>" : "<Over>(hopping-prev)",
+\	"\<C-u>" : "<Over>(scroll-u)",
+\	"\<C-d>" : "<Over>(scroll-d)",
+\}
 
 " clever f config
 let g:clever_f_smart_case = 1
@@ -234,7 +273,8 @@ set softtabstop=2
 "set tabstop=2
 
 if has("unix")
-  set guifont=Monospace\ 13
+  " set guifont=Monospace\ 13
+  set guifont=Ubuntu\ Mono\ 12
 else
   set guifont=Lucida_Console:h12:b:cANSI:qDRAFT   
 endif
@@ -305,16 +345,16 @@ let g:asyncrun_open = 9
 " nmap <F1> :AsyncRun uploadFw.py mainline 120 121
 nmap <F1> :call UploadLoadware()<CR>
 nmap <F2> :call BuildBind("")<CR>
-nmap <F3> :cnext<CR>
+nmap <F3> :VOBROOT=~/main2/ ~/main2/vobs/Opera_DevTools/scripts/build_and_test_WE3_4_x86.sh
 nmap <F4> :AirlineToggleWhitespace<CR>
 nmap <F5> :FSSplitLeft<CR>
 nmap <F6> :NERDTreeToggle<CR>
 nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F8> :TagbarToggle<CR>
 nmap <F9> :MundoToggle<CR>
-nnoremap <silent> ,yr :YRShow<CR>
-nnoremap <silent> ,yy :YRShow<CR>
 nmap <F10> :YRShow<CR>
+nmap <F11> :cnext<CR>
+" nnoremap <silent> ,yy :YRShow<CR>
 " nmap ,rr  :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 10<CR>
 " nmap ,ll  :let g:phones="121 122 123" \| let g:branch="mainline"
 "nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
@@ -332,6 +372,12 @@ inoremap <C-Down> <Esc>:m .+1<CR>==gi
 inoremap <C-Up> <Esc>:m .-2<CR>==gi
 vnoremap <C-Down> :m '>+1<CR>gv=gv
 vnoremap <C-Up> :m '<-2<CR>gv=gv
+
+"switch windows
+nnoremap <A-Left> <C-w>h
+nnoremap <A-Right> <C-w>l
+nnoremap <A-Up> <C-w>k
+nnoremap <A-Down> <C-w>j
 
 nnoremap <C-PageUp> gt
 nnoremap <C-PageUp> gT
@@ -391,7 +437,7 @@ let g:asyncrun_auto = "make"
 
 let g:asyncrun_status = ''
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
-
+tnoremap <expr> <A-r> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 " paste in insert mode
 " C-r register
 " delete in insert mode C-u line C-w word, C-h character
@@ -754,80 +800,98 @@ endif
 " :set guicursor&
 
 " 
-" function! TestHover()
-  " echom "start test"
-  " let l:servers = filter(lsp#get_whitelisted_servers(), 'lsp#capabilities#has_hover_provider(v:val)')
-  " if len(l:servers) == 0
-    " echom "no servers"
-    " return
-  " endif
-" 
-  " for l:server in l:servers
-      " call lsp#send_request(l:server, {
-          " \ 'method': 'textDocument/hover',
-          " \ 'params': {
-          " \   'textDocument': lsp#get_text_document_identifier(),
-          " \   'position': lsp#get_position(),
-          " \ },
-          " \ 'on_notification': function('TestHoverReceive', [l:server]),
-          " \ })
-  " endfor
-" 
-  " echo 'Retrieving hover ...'
-" endfunction
-" 
-" function! TestHoverReceive(server, data) abort
-  " echom "start TestHoverReceive1>"  . a:server
-  " echom "start TestHoverReceive2>"  . join(keys(a:data))
-  " echom "start TestHoverReceive3>"  . join(values(a:data))
-  " " if lsp#client#is_error(a:data['response'])
-    " " echom "got no answer"
-    " " return
-  " " endif
-" " 
-  " " if !has_key(a:data['response'], 'result')
-    " " echom "no result"
-    " " return
-  " " endif
-  " echom "res rest empty " . empty(a:data['response']['result'])
-  " echom "res rest empty con" . empty(a:data['response']['result']['contents'])
-  " if !empty(a:data['response']['result']) && !empty(a:data['response']['result']['contents'])
-    " call ProcessData(a:data['response']['result']['contents'])
-    " echo l:data
-    " echom "got back " . join(values(l:data['response']['result']['contents']))
-    " return
-  " else
-    " echom "xxxx"
-  " endif
-  " echom "bye"
-" endfunction
-" 
-" function! ProcessData(data) abort
-    " echom "xxxxxxxxxxxxx"
-     " if type(a:data) == type([])
-       " echom "type []"
-        " for l:entry in a:data
-            " echom "entry " . entry
-            " call ProcessData(entry)
-        " endfor
-        " return 'markdown'
-    " endif
-    " if type(a:data) == type('')
+let g:hoverInfo=""
+function! TestHover()
+  echom "start test"
+  let g:hoverInfo=""
+  let l:servers = filter(lsp#get_whitelisted_servers(), 'lsp#capabilities#has_hover_provider(v:val)')
+  if len(l:servers) == 0
+    echom "no servers"
+    return
+  endif
+
+  for l:server in l:servers
+      call lsp#send_request(l:server, {
+          \ 'method': 'textDocument/hover',
+          \ 'params': {
+          \   'textDocument': lsp#get_text_document_identifier(),
+          \   'position': lsp#get_position(),
+          \ },
+          \ 'on_notification': function('TestHoverReceive', [l:server]),
+          \ })
+  endfor
+
+  echo 'Retrieving hover ...'
+endfunction
+
+function! TestHoverReceive(server, data) abort
+  if lsp#client#is_error(a:data['response'])
+    echom "got no answer"
+    return
+  endif
+
+  if !has_key(a:data['response'], 'result')
+    echom "no result"
+    return
+  endif
+  if !empty(a:data['response']['result']) && !empty(a:data['response']['result']['contents'])
+    call ProcessData(a:data['response']['result']['contents'])
+    return
+  endif
+endfunction
+
+function! ProcessData(data) abort
+     if type(a:data) == type([])
+        for l:entry in a:data
+            call ProcessData(entry)
+        endfor
+        return 'markdown'
+    endif
+    if type(a:data) == type('')
        " echom "type ''"
-     " silent put =a:data
-      " echom a:data
-    " endif
-    " if type(a:data) == type({}) && has_key(a:data, 'language')
+      let g:hoverInfo=a:data
+      echom a:data
+    endif
+    if type(a:data) == type({}) && has_key(a:data, 'language')
        " echom "type {}"
        " silent put ='```'.a:data.language
        " silent put =a:data.value
        " silent put ='```'
-        " echom a:data.value
-    " endif
-    " if type(a:data) == type({}) && has_key(a:data, 'kind')
+        let g:hoverInfo=a:data.value
+        echom a:data.value
+    endif
+    if type(a:data) == type({}) && has_key(a:data, 'kind')
       " echom "type {}2"
-        " echom a:data.value
-        " echom "ldata kind " . a:data.kind
-        " return a:data.kind ==? 'plaintext' ? 'text' : a:data.kind
-    " endif
-  " endfunction
+        let g:hoverInfo=a:data.value
+        echom a:data.value
+        echom "ldata kind " . a:data.kind
+        return a:data.kind ==? 'plaintext' ? 'text' : a:data.kind
+    endif
+  endfunction
+  
+  
+  
+let s:timer = -1
+
+function! MyBalloonExpr()
+  call TestHover()
+  call timer_stop( s:timer )
+  let s:message =
+          \ 'Cursor is at line ' . v:beval_lnum .
+          \', column ' . v:beval_col .
+          \ ' of file ' .  bufname(v:beval_bufnr) .
+          \ ' on word "' . v:beval_text . '"'
+  let s:timer = timer_start( 100, 'RealBalloonExpr' )
+endfunction
+
+function! RealBalloonExpr(timer)
+  echom 'MyBalloonExpr: ' . g:hoverInfo
+  call balloon_show( g:hoverInfo )
+endfunction
+
+" set mouse=a
+" set ttymouse=sgr
+" set balloonexpr=MyBalloonExpr()
+" set balloondelay=250
+" set ballooneval
+" set balloonevalterm

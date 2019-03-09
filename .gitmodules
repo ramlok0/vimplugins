@@ -28,10 +28,6 @@
 [submodule "vim-sleuth"]
 	path = vim-sleuth
 	url = https://github.com/tpope/vim-sleuth
-[submodule "VisIncr"]
-	path = VisIncr
-	url = https://github.com/vim-scripts/VisIncr
-	ignore = untracked
 [submodule "YouCompleteMe"]
 	path = YouCompleteMe
 	url = https://github.com/Valloric/YouCompleteMe.git
@@ -137,3 +133,24 @@
 [submodule "vim-cpp-enhanced-highlight"]
 	path = vim-cpp-enhanced-highlight
 	url = https://github.com/octol/vim-cpp-enhanced-highlight.git
+[submodule "vim-minimap"]
+	path = vim-minimap
+	url = https://github.com/severin-lemaignan/vim-minimap.git
+[submodule "vim-colortuner"]
+	path = vim-colortuner
+	url = https://github.com/zefei/vim-colortuner.git
+[submodule "vim-notes"]
+	path = vim-notes
+	url = https://github.com/xolox/vim-notes.git
+[submodule "vim-misc"]
+	path = vim-misc
+	url = https://github.com/xolox/vim-misc.git
+[submodule "traces.vim"]
+	path = traces.vim
+	url = https://github.com/markonm/traces.vim.git
+[submodule "vim-sneak"]
+	path = vim-sneak
+	url = https://github.com/justinmk/vim-sneak.git
+[submodule "LanguageClient-neovim"]
+	path = LanguageClient-neovim
+	url = https://github.com/autozimu/LanguageClient-neovim.git

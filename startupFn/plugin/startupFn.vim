@@ -807,14 +807,14 @@ function! SearchAndReplacev() range
   if len(line0) == 0
           return ''
   endif
-  let replacement=""
+  let l:replacement=""
   call inputsave()
-  let a:replacement = input('Enter replacement:')
-  let a:searchString = line0[column_start - 1: column_start + l:width]
+  let l:replacement = input('Enter replacement:')
+  let l:searchString = line0[column_start - 1: column_start + l:width]
   call inputrestore()
-  echom "xxx>".replacement
+  echom "xxx>".l:replacement
 "   " let l:currentWord = substitute(@*, '\n', '', 'g')
-  exe "OverCommandLine ,$s/" . a:searchString . "/" . a:replacement ."/gc"
+  exe "OverCommandLine ,$s/" . l:searchString . "/" . l:replacement ."/gc"
   " call feedkeys(":,$s/" . a:searchString . \"/" . a:replacement ."/gc","t")
 endfunction
 
@@ -850,23 +850,23 @@ function! SearchandreplaceBlock() range
     echom "Replace for : " . join(linesuniq," <> ")
     let inputStr = "Enter replacement params(s) " . len(linesuniq). ": "
     call inputsave()
-      let a:replacement = join(split(input( inputStr )),",")
+      let l:replacement = join(split(input( inputStr )),",")
     call inputrestore()
     if len(linesuniq) == 1
       let searchstring = linesuniq[0]
-      call feedkeys(":,$S/" . searchstring . "/" . a:replacement . "/gc")
+      call feedkeys(":,$S/" . searchstring . "/" . l:replacement . "/gc")
     else
       let searchstring = join(linesuniq,", ")
-      call feedkeys(":,$S/{" . searchstring . "}/{" . a:replacement . "}/gc")
+      call feedkeys(":,$S/{" . searchstring . "}/{" . l:replacement . "}/gc")
     endif
   elseif vmode == "v"
     let lines[0] = lines[0][ column_start : ]
     let lines[-1] = lines[-1][ : column_end ]
     call inputsave()
-      let a:replacement = input( "Replacement string" )
+      let l:replacement = input( "Replacement string" )
     call inputrestore()
     let lines=join(lines,"\\_.")
-    call feedkeys(":,$s/" . lines . "/" . a:replacement . "/gc")
+    call feedkeys(":,$s/" . lines . "/" . l:replacement . "/gc")
     " call feedkeys(":,$S/{" . searchstring . "}/{" . a:replacement . "}/gc")
   endif
   return
@@ -1257,10 +1257,10 @@ function! ReplaceBuffers(expr)
     let searchTerm = a:expr
   endif
   call inputsave()
-  let a:input = input('Enter search string <' . searchTerm .'>:')
+  let l:input = input('Enter search string <' . searchTerm .'>:')
   call inputrestore()
-  if !empty(a:input)
-    let searchTerm=a:input
+  if !empty(l:input)
+    let searchTerm=l:input
   endif
   if (empty(searchTerm))
     return
@@ -1300,10 +1300,10 @@ function! SearchBuffers(expr)
     let searchTerm = a:expr
   endif
   call inputsave()
-  let a:input = input('Enter search string <' . searchTerm .'>:')
+  let l:input = input('Enter search string <' . searchTerm .'>:')
   call inputrestore()
-  if !empty(a:input)
-    let searchTerm=a:input
+  if !empty(l:input)
+    let searchTerm=l:input
   endif
   if (empty(searchTerm))
     echom "nothing to search for"
@@ -1438,6 +1438,7 @@ function! RemoveLineFromQuickFix( line )
   call setqflist( filter( getqflist(), "v:key['lnum'] != l:line" ) )
 endfunction
 
+"feed list in quick fix as paths to rename variable
 function! QfToRename(...)
   let searchTerm=""
   if a:0 == 0
