@@ -16,11 +16,12 @@ Plug 'xolox/vim-notes.git'
 Plug 'xolox/vim-misc.git'
 Plug 'markonm/traces.vim'
 Plug 'justinmk/vim-sneak'
+" Plug 'autozimu/LanguageClient-neovim', { 'on': 'LanguageClientStart' }
 Plug 'autozimu/LanguageClient-neovim'
 " Plug 'tomasr/molokai.git' " now it's ok in plug menu...but it won't update
 Plug 'simnalamburt/vim-mundo.git', { 'on': 'MundoToggle' }
 Plug 'ronakg/quickr-cscope.vim.git'
-Plug 'octol/vim-cpp-enhanced-highlight.git', { 'for': 'cpp' } "maybe I am ok with just c.vim in .vim/syntax
+" Plug 'octol/vim-cpp-enhanced-highlight.git', { 'for': 'cpp' } "maybe I am ok with just c.vim in .vim/syntax
 Plug 'severin-lemaignan/vim-minimap', { 'on': 'Minimap' }
 Plug 'majutsushi/tagbar.git', { 'for': 'cpp' }
 Plug 'vim-airline/vim-airline.git'
@@ -30,8 +31,10 @@ Plug 'derekwyatt/vim-fswitch.git'
 Plug 'airblade/vim-gitgutter.git'
 Plug 'tpope/vim-sleuth'
 Plug 'Valloric/YouCompleteMe.git', { 'for': 'cpp' }
-Plug 'tpope/vim-fugitive.git', { 'on': 'Gdiff' }
-Plug 'tommcdo/vim-fugitive-blame-ext.git', { 'on': 'Gblame' }
+" Plug 'tpope/vim-fugitive.git', { 'on': 'Gdiff' }
+" Plug 'tommcdo/vim-fugitive-blame-ext.git', { 'on': 'Gdiff' }
+Plug 'tpope/vim-fugitive.git'
+Plug 'tommcdo/vim-fugitive-blame-ext.git'
 Plug 'junegunn/fzf.vim.git'
 Plug 'terryma/vim-multiple-cursors.git'
 Plug 'scrooloose/nerdtree.git', { 'on': 'NERDTreeToggle' }
@@ -54,7 +57,6 @@ Plug 'wincent/ferret.git'
 Plug 'devjoe/vim-codequery.git', { 'for': 'cpp' }
 Plug 'prabirshrestha/vim-lsp.git', { 'for': 'cpp' }
 Plug 'pdavydov108/vim-lsp-cquery.git', { 'for': 'cpp' }
-" Plug 'prabirshrestha/vim-lsp.git'
 " Plug 'pdavydov108/vim-lsp-cquery.git'
 Plug 'prabirshrestha/async.vim.git'
 Plug 'osyo-manga/vim-over.git'
@@ -63,7 +65,7 @@ Plug 'jremmen/vim-ripgrep.git'
 Plug 'cohama/agit.vim.git', { 'on': 'Agit' }
 Plug '~/.vim/bundle/startupFn'
 call plug#end()
- ,
+
 let g:quickr_cscope_autoload_db = 0
 "allows Highlight plugin to save conf
 "set viminfo^=!
@@ -75,6 +77,31 @@ elseif has('nvim')
   set viminfo=!,<800,'10,/50,:100,h,f0,n~/.config/nvim/cache/.viminfo
 endif
 
+
+
+"language server options
+"nn <silent> xb :call LanguageClient#findLocations({'method':'$ccls/inheritance'})<cr>
+" bases of up to 3 levels
+" nn <silent> xB :call LanguageClient#findLocations({'method':'$ccls/inheritance','levels':3})<cr>
+" " derived
+" nn <silent> xd :call LanguageClient#findLocations({'method':'$ccls/inheritance','derived':v:true})<cr>
+" " derived of up to 3 levels
+" nn <silent> xD :call LanguageClient#findLocations({'method':'$ccls/inheritance','derived':v:true,'levels':3})<cr>
+" 
+" " caller
+" nn <silent> xc :call LanguageClient#findLocations({'method':'$ccls/call'})<cr>
+" " callee
+" nn <silent> xC :call LanguageClient#findLocations({'method':'$ccls/call','callee':v:true})<cr>
+" 
+" " $ccls/member
+" " nested classes / types in a namespace
+" nn <silent> xs :call LanguageClient#findLocations({'method':'$ccls/member','kind':2})<cr>
+" " member functions / functions in a namespace
+" nn <silent> xf :call LanguageClient#findLocations({'method':'$ccls/member','kind':3})<cr>
+" " member variables / variables in a namespace
+" nn <silent> xm :call LanguageClient#findLocations({'method':'$ccls/member'})<cr>
+
+let g:LanguageClient_selectionUI="quickfix"
 " let g:clighter8_libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
 
 "allow you to move freely in visual block mode
@@ -130,6 +157,7 @@ set undoreload=500
 set display=lastline
 
 
+    " \ 'cpp': ['ccls', --log-file=/tmp/cc.log --init={'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }}}'],
 let g:LanguageClient_serverCommands = {
     \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
     \ 'cpp': ['ccls', '--log-file=/tmp/cc.log'],
@@ -171,6 +199,8 @@ function! LoadTags()
     " call lsp#register_server({ 'name': 'cquery', 'cmd': {server_info->['cquery']}, 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))}, 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' }, 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'], })
     call lsp#enable()
   endif
+  " exec LanguageClientStop"
+  " exec LanguageClientStart"
 endfunction
 " function! SetupLsp()
   " if executable('cquery')
@@ -218,6 +248,8 @@ let g:ycm_complete_in_comments = 1 " Completion in comments
 let g:ycm_add_preview_to_completeopt = 1
 "let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/.ycm_extra_conf.py'
+
+set completeopt=menu,menuone,preview,noselect,noinsert
 " turn off syntax checking
 " change
 " let g:ycm_show_diagnostics_ui = 1
@@ -394,6 +426,10 @@ nnoremap <silent> ,lc :LspCqueryCallers<CR>
 " rename files from quicfix window
 nnoremap <silent> ,qr :call QfToRename()<CR>
 nnoremap <silent> ,qf :CodeQueryFilter !  
+
+nnoremap <silent> ,lh call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent> ,lh call LanguageClient#findLocations({'method':'$ccls/call'})<CR>
+
 
 nnoremap <silent> ,cs :CodeQuery Symbol<CR>
 nnoremap <silent> ,cc :CodeQuery Call<CR>
@@ -737,7 +773,7 @@ set clipboard=unnamedplus
 " endfunction
 
 " new addons to speec up vim 
-set synmaxcol=120
+set synmaxcol=200
 let g:matchparen_timeout = 20
 let g:matchparen_insert_timeout = 20
 
@@ -895,3 +931,11 @@ endfunction
 " set balloondelay=250
 " set ballooneval
 " set balloonevalterm
+"
+"
+" :profile start profile.log
+":profile func *
+":profile file *
+" At this point do slow actions
+":profile pause
+":noautocmd qall!
