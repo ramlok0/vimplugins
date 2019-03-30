@@ -75,8 +75,19 @@ function! TraceShowSipWith(expr)
     call TraceHighlightSIP()
 endfunction
 
-
 function! TraceOnlySip()
+    echom "Test"
+    setl foldmethod=expr
+    setlocal foldexpr=(((getline(v:lnum)=~':\\(.\\)\\1\\{2\\}.*$')\|\|(getline(v:lnum)=~'^$')\|\|(getline(v:lnum)=~'(\\d\\{3,5}):')\|\|(getline(v:lnum)=~'^\\s'))\&\&((getline(v:lnum)!~'SIP.Messages')\&\&(getline(v:lnum+1)!~'SIP.Messages')\&\&(getline(v:lnum)!~'Packet.[IO]')))?1:0 foldmethod=expr
+    setl foldminlines=0
+    setl foldlevel=0
+    set foldclose=all
+    setl foldtext=""
+    set fillchars=""
+    call TraceHighlightSIP()
+endfunction
+
+function! TraceSipAndErrors()
     echom "Test"
     setl foldmethod=expr
     setlocal foldexpr=(((getline(v:lnum)=~':\\(.\\)\\1\\{2\\}.*$')\|\|(getline(v:lnum)=~'^$')\|\|(getline(v:lnum)=~'(\\d\\{3,5}):')\|\|(getline(v:lnum)=~'^\\s'))\&\&((getline(v:lnum)!~'SIP.Messages')\&\&(getline(v:lnum+1)!~'SIP.Messages')\&\&(getline(v:lnum)!~'Packet.[IO]')\&\&(getline(v:lnum)!~'error\\\|warning\\\|invalid\\\|fail')\&\&(getline(v:lnum-1)!~'error\\\|warning\\\|invalid\\\|fail')))?1:0 foldmethod=expr
@@ -1351,6 +1362,27 @@ function! UploadLoadware()
   call feedkeys(":AsyncRun uploadFw.py " . l:gitFolder . " " . l:phoneNr)
 endfunction
 
+
+function! BuildLocal()
+  let folder=expand('%:p:h')
+  let folder="/home/km000057/GIT/mainline/vobs/Opera_Infrastructure_Services/Media/Common/"
+  echom "folder ".folder."<"
+  let l:gitfolder = matchstr(folder,'km000057/.\{-}/\zs.\{-}\ze/')
+  let l:vagrantPath = matchstr(folder,'km000057/.\{-}/\zs.*\ze')
+  let l:vagrantPath = "~/" . l:vagrantPath
+  echom "git " . l:gitfolder
+  echom "path " . l:vagrantPath
+  if index(map(["v3r5","main2","mainline","smainline"], 'v:val ==
+l:gitfolder'),1) == -1
+    echom "unknown git folder " . l:gitfolder
+    return
+  endif
+  " exe AsyncRun buildLocal.sh  . g:GetGitFolder . .g:vagrantPath .
+_and_test_WE3_4_x86.sh buildParse.sh  . g:gitfolder .  targetModel .
+sip 1 %:p:h"
+endfunction
+
+
 " all scripts exit with make exit code (vagrant->local buildScript -> asyncRes
 " code)
 let g:gitfolder="mainline"
@@ -1514,12 +1546,13 @@ endfunction
 
 function! SetTags(expr)
   "path to git (mainline) folder
-  " echom "Set tag path to" . a:expr
+  echom "Set tag path to" . a:expr
   let g:tagPath=a:expr . "/phones.tag" 
   if filereadable(expand(g:tagPath))
     exe "set tags=" . g:tagPath
   endif
   let l:csPath = a:expr . "/vobs/cscope.files"
+  echom "readable " . filereadable(expand(l:csPath))
   if filereadable(expand(l:csPath))
     exe "cs kill cscope.files"
     exe "cs add " . a:expr . "/vobs/cscope.files" . " " . " "

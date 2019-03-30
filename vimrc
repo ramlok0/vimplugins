@@ -9,7 +9,9 @@ set clipboard=unnamedplus
 call plug#begin('~/.vim/bundle')
 " Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'vim-scripts/YankRing.vim'
-Plug 'junegunn/fzf.git'
+Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
+Plug 'junegunn/fzf.vim'
+Plug 'pbogut/fzf-mru.vim.git'
 Plug '~/.vim/bundle/molokai'
 Plug 'zefei/vim-colortuner.git', { 'on': 'Colortuner' }
 Plug 'xolox/vim-notes.git'
@@ -35,7 +37,6 @@ Plug 'Valloric/YouCompleteMe.git', { 'for': 'cpp' }
 " Plug 'tommcdo/vim-fugitive-blame-ext.git', { 'on': 'Gdiff' }
 Plug 'tpope/vim-fugitive.git'
 Plug 'tommcdo/vim-fugitive-blame-ext.git'
-Plug 'junegunn/fzf.vim.git'
 Plug 'terryma/vim-multiple-cursors.git'
 Plug 'scrooloose/nerdtree.git', { 'on': 'NERDTreeToggle' }
 Plug 'tommcdo/vim-exchange.git'
@@ -48,7 +49,6 @@ Plug 'junegunn/vim-easy-align.git'
 Plug 'rhysd/clever-f.vim.git'
 Plug 'tpope/vim-surround.git'
 Plug 'adelarsq/vim-matchit.git'
-Plug 'pbogut/fzf-mru.vim.git'
 Plug 'dyng/ctrlsf.vim.git', { 'on': 'CtrlSF' }
 Plug 'brooth/far.vim.git', { 'on': 'Far' }
 Plug 'will133/vim-dirdiff.git', { 'on': 'DirDiff' }
@@ -62,8 +62,10 @@ Plug 'prabirshrestha/async.vim.git'
 Plug 'osyo-manga/vim-over.git'
 Plug 'jiangmiao/auto-pairs.git'
 Plug 'jremmen/vim-ripgrep.git'
+Plug 'skywind3000/quickmenu.vim'
 Plug 'cohama/agit.vim.git', { 'on': 'Agit' }
 Plug '~/.vim/bundle/startupFn'
+Plug 'vim-airline/vim-airline-themes'
 call plug#end()
 
 let g:quickr_cscope_autoload_db = 0
@@ -78,6 +80,19 @@ elseif has('nvim')
 endif
 
 
+
+call g:quickmenu#append('LspHover', 'LspHover', '')
+call g:quickmenu#append('LspCCaller', 'LspCqueryCallers', '')
+call g:quickmenu#append('LspDef', 'LspDefinition', '')
+call g:quickmenu#append('LspDiag', 'LspDocumentDiagnostics', '')
+call g:quickmenu#append('LangSMenu', 'call LanguageClient_contextMenu()', '')
+call g:quickmenu#append('LangSHover', 'call LanguageClient#textDocument_hover()', '')
+call g:quickmenu#append('LangSImpl', 'call LanguageClient#textDocument_implementation()', '')
+call g:quickmenu#append('LangSRefs', 'call LanguageClient#textDocument_references()', '')
+call g:quickmenu#append('LangSTypeDef', 'call LanguageClient#textDocument_typeDefinition()', '')
+call g:quickmenu#append('LangSDef', 'call LanguageClient#textDocument_definition()', '')
+call g:quickmenu#append('LangSCaller', "call LanguageClient#findLocations({'method':'$ccls/call'})", '')
+call g:quickmenu#append('TraceHide', 'call TraceHide("SIP\ Signalling\\|Conversation*\\|CallView*")', '')
 
 "language server options
 "nn <silent> xb :call LanguageClient#findLocations({'method':'$ccls/inheritance'})<cr>
@@ -100,16 +115,113 @@ endif
 " nn <silent> xf :call LanguageClient#findLocations({'method':'$ccls/member','kind':3})<cr>
 " " member variables / variables in a namespace
 " nn <silent> xm :call LanguageClient#findLocations({'method':'$ccls/member'})<cr>
-
+let g:LanguageClient_diagnosticsEnable=0
 let g:LanguageClient_selectionUI="quickfix"
 " let g:clighter8_libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
 
+    " \ 'cpp': ['ccls', --log-file=/tmp/cc.log --init={'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }}}'],
+let g:LanguageClient_serverCommands = {
+    \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'cpp': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'cuda': ['ccls', '--log-file=/tmp/cc.log'],
+    \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
+    \ }
+
+let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
+" let g:LanguageClient_settingsPath = '/home/YOUR_USERNAME/.config/nvim/settings.json'
+" https://github.com/autozimu/LanguageClient-neovim/issues/379 LSP snippet is not supported
+let g:LanguageClient_hasSnippetSupport = 0
+
+let g:LanguageClient_hoverPreview="Always"
 "allow you to move freely in visual block mode
 set virtualedit=block
 
+" {{{
 
-" autopair - do not jump do end pair 
+" makes * and # work on visual mode too.
+function! s:VSetSearch(cmdtype)
+  let temp = @s
+  norm! gv"sy
+  let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\n', '\\n', 'g')
+    " Use this line instead of the above to match matches spanning across lines
+  "let @/ = '\V' . substitute(escape(@s, a:cmdtype.'\'), '\_s\+', '\\_s\\+', 'g')
+  let @s = temp
+endfunction
+
+xnoremap * :<C-u>call <SID>VSetSearch('/')<CR>/<C-R>=@/<CR><CR>
+xnoremap # :<C-u>call <SID>VSetSearch('?')<CR>?<C-R>=@/<CR><CR>
+
+"}}}
+
+"##########################
+" Join lines and keep the cursor in place
+" nnoremap J mzJ`z
+
+" Split line (opposite to join lines)
+nnoremap M :call <SID>split_line()<CR>
+
+function s:split_line()
+  " Do a split
+  exe "normal! i\<CR>\<ESC>"
+
+  " Remember position and last search expression
+  normal! mw
+  let _s = @/
+
+  " Remove any trailing whitespace characters from the line above
+  silent! -1 s/\v +$//
+
+  " Restore last search expression
+  nohlsearch
+  let @/ = _s
+
+  " Restore cursor position
+  normal! `w
+endfunction
+
+"##########################
+
+" Center search results
+nnoremap n nzvzz
+nnoremap N Nzvzz
+nnoremap * *zvzz
+nnoremap # #zvzz
+
+"##########################
+
+" Normalize Y behavior to yank till the end of line
+nnoremap Y y$
+
+
+"##########################
+" Open diffs in vertical splits
+" Use 'xdiff' library options: patience algorithm with indent-heuristics (same to Git options)
+" NOTE: vim uses the external diff utility which doesn't do word diffs nor can it find moved-and-modified lines.
+" See: https://stackoverflow.com/questions/36519864/the-way-to-improve-vimdiff-similarity-searching-mechanism
+set diffopt=internal,filler,vertical,context:5,foldcolumn:1,indent-heuristic,algorithm:patience
+
+
+"##########################
+" Timeout settings
+" Wait forever until I recall mapping
+" Don't wait to much for keycodes send by terminal, so there's no delay on <ESC>
+set notimeout
+set ttimeout
+set timeoutlen=2000
+set ttimeoutlen=30
+
+set backspace=indent,eol,start
+
+
+"##########################
+
+" autopair - do not jump do end pair
 let g:AutoPairsMultilineClose=0
+
+
+"##########################
+" allow <C-a> increment numbres and letters
+set nrformats+=alpha
 
 
 let g:rainbow_active = 1
@@ -122,7 +234,6 @@ colorscheme molokai
 
 syntax on
 
-"set scrolloff=1
 "TODO REMOVE REMOVE JUST DEBUG
    " let g:ycm_server_use_vim_stdout = 1
    " let g:ycm_server_log_level = 'debug'
@@ -130,6 +241,8 @@ syntax on
 " show the editing mode on the last line
 set showmode
 "set statusline+=%F
+
+"##########################
 " tell vim to keep a backup file
 set backup
 "mkdir ~/.vim/.backup ~/.vim/.swp ~/.vim/.undo
@@ -154,40 +267,31 @@ set undodir=~/.vim/.undo
 set undolevels=500
 set undoreload=500
 
+"##########################
 set display=lastline
 
 
     " \ 'cpp': ['ccls', --log-file=/tmp/cc.log --init={'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }}}'],
-let g:LanguageClient_serverCommands = {
-    \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
-    \ 'cpp': ['ccls', '--log-file=/tmp/cc.log'],
-    \ 'cuda': ['ccls', '--log-file=/tmp/cc.log'],
-    \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
-    \ }
-
-let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
-" let g:LanguageClient_settingsPath = '/home/YOUR_USERNAME/.config/nvim/settings.json'
-" https://github.com/autozimu/LanguageClient-neovim/issues/379 LSP snippet is not supported
-let g:LanguageClient_hasSnippetSupport = 0
 
 " sneak config
 let g:sneak#label = 1
+
+
+
+"##########################
 " codequery db
 let g:my_db_path="~/GIT/mainline/"
 "orig let g:my_db_path="~/bin/"
 " usage :CodeQuery 'opton from list' word under cursor
 " similar to \s with cscope
 "
-"
+"##########################
 " rules for loading tags
-"
 let g:currentTagFilePath=""
 let g:lspLoaded=""
 " autocmd BufReadPost,BufWinEnter *.cpp :call LoadTags()
 autocmd BufWinEnter *.cpp :call LoadTags()
 function! LoadTags()
-  " echom "xxx"
-  " echom expand('%:p:h')
   let l:path = expand('%:p:h')
   let l:path = substitute(l:path,'vobs.*','','')
   if (g:currentTagFilePath != l:path )
@@ -196,23 +300,11 @@ function! LoadTags()
   endif
   if (g:lspLoaded == "")
     let g:lspLoaded = "true"
-    " call lsp#register_server({ 'name': 'cquery', 'cmd': {server_info->['cquery']}, 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))}, 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' }, 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'], })
     call lsp#enable()
   endif
-  " exec LanguageClientStop"
   " exec LanguageClientStart"
 endfunction
-" function! SetupLsp()
-  " if executable('cquery')
-     " au User lsp_setup call lsp#register_server({
-        " \ 'name': 'cquery',
-        " \ 'cmd': {server_info->['cquery']},
-        " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-        " \ 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' },
-        " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-        " \ })
-  " endif
-" endfunction
+
 if executable('cquery')
    au User lsp_setup call lsp#register_server({
       \ 'name': 'cquery',
@@ -231,14 +323,10 @@ endif
       " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
       " \ })
 " endif
-" if filereadable(expand("~/bin/phones.tag"))
-  " set tags=~/bin/phones.tag
-" endif
-" 
-" if filereadable(expand("~/GIT/mainline/"))
-  " exe "cs add " . "/home/km000057/GIT/mainline/vobs/cscope.files" . " " . " "
-" endif
-" exe "cscope add /home/km000057/phones_GIT/vobs/cscope.files"
+
+
+"################################################
+" YouCompleteMe setup
 let g:ycm_min_num_of_chars_for_completion = 2
 let g:ycm_auto_trigger = 1
 let g:ycm_collect_identifiers_from_tags_files = 0
@@ -249,22 +337,28 @@ let g:ycm_add_preview_to_completeopt = 1
 "let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/YouCompleteMe/third_party/ycmd/cpp/ycm/.ycm_extra_conf.py'
 let g:ycm_global_ycm_extra_conf = '~/.vim/bundle/.ycm_extra_conf.py'
 
-set completeopt=menu,menuone,preview,noselect,noinsert
-" turn off syntax checking
-" change
-" let g:ycm_show_diagnostics_ui = 1
 let g:ycm_confirm_extra_conf = 0
 let g:ycm_key_list_select_completion = ['<TAB>','<Down>']
 let g:ycm_key_list_previous_completion=['<Up>']
 let g:ycm_autoclose_preview_window_after_insertion = 1
 let g:ycm_autoclose_preview_window_after_completion = 0
-
 "turn off YMC 
 "nnoremap <leader>y :let g:ycm_auto_trigger=0<CR>                " turn off YCM
 "nnoremap <leader>Y :let g:ycm_auto_trigger=1<CR>                "turn on YCM
+" turn off syntax checking
+" change
+" let g:ycm_show_diagnostics_ui = 1
+
+"################################################
+
+set completeopt=menu,menuone,preview,noselect,noinsert
+
 
 "" SNIPETS
 nnoremap ,hfor :-1read $HOME/.vim/bundle/after/snippets/for.txt<CR>f(a
+
+"##########################################
+
 
 let g:notes_directories = ['~/doc/vimNotes', '~/doc/vimNotes']
 
@@ -278,6 +372,9 @@ let g:hopping#keymapping = {
 " clever f config
 let g:clever_f_smart_case = 1
 let g:clever_f_show_prompt = 1
+" Use same highlighting group as a normal search
+" let g:clever_f_mark_char_color = 'IncSearch'
+
 
 set backspace=indent,eol,start
 
@@ -385,8 +482,8 @@ nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F8> :TagbarToggle<CR>
 nmap <F9> :MundoToggle<CR>
 nmap <F10> :YRShow<CR>
-nmap <F11> :cnext<CR>
-" nnoremap <silent> ,yy :YRShow<CR>
+noremap <silent><F11> :call quickmenu#toggle(0)<cr>
+nnoremap <silent> ,yy :YRShow<CR>
 " nmap ,rr  :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 10<CR>
 " nmap ,ll  :let g:phones="121 122 123" \| let g:branch="mainline"
 "nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
@@ -473,6 +570,7 @@ let g:asyncrun_auto = "make"
 
 let g:asyncrun_status = ''
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
+let g:airline_theme='hybrid'
 tnoremap <expr> <A-r> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 " paste in insert mode
 " C-r register
@@ -550,22 +648,23 @@ set updatetime=250
 
 """""FNC
 " toggles the quickfix window.
-let g:jah_Quickfix_Win_Height = 10
-command! -bang -nargs=? QFix call QFixToggle(<bang>0)
-function! QFixToggle(forced)
-  if exists("g:qfix_win") && a:forced == 0
-    cclose
-  else
-    execute "copen " . g:jah_Quickfix_Win_Height
-  endif
-endfunction
-
-" used to track the quickfix window
-augroup QFixToggle
- autocmd!
- autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
- autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | endif
-augroup END
+" replaced by async quick fix method
+" let g:jah_Quickfix_Win_Height = 10
+" command! -bang -nargs=? QFix call QFixToggle(<bang>0)
+" function! QFixToggle(forced)
+  " if exists("g:qfix_win") && a:forced == 0
+    " cclose
+  " else
+    " execute "copen " . g:jah_Quickfix_Win_Height
+  " endif
+" endfunction
+" 
+" " used to track the quickfix window
+" augroup QFixToggle
+ " autocmd!
+ " autocmd BufWinEnter quickfix let g:qfix_win = bufnr("$")
+ " autocmd BufWinLeave * if exists("g:qfix_win") && expand("<abuf>") == g:qfix_win | unlet! g:qfix_win | endif
+" augroup END
 
 "ultisnip config
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
@@ -797,8 +896,8 @@ let g:ycm_auto_trigger = 1
 " @subjectego :set more | verbose function {function_name} will show you function contents and where it is located.
 
 "make cursor move visible?
-highlight Cursor guifg=blue guibg=red
-highlight iCursor guifg=blue guibg=red
+highlight Cursor guifg=blue guibg=green
+highlight iCursor guifg=blue guibg=green
 " set guicursor=n-v-c:block-Cursor
 " set guicursor+=i:ver10-iCursor
 " set guicursor+=n-v-c:blinkon0
@@ -835,7 +934,7 @@ endif
 " Restore default setting:
 " :set guicursor&
 
-" 
+"
 let g:hoverInfo=""
 function! TestHover()
   echom "start test"
@@ -939,3 +1038,96 @@ endfunction
 " At this point do slow actions
 ":profile pause
 ":noautocmd qall!
+"
+"
+""Swap top/bottom or left/right split
+" Ctrl+W R
+" Ctrl + DIRECTIONS (JHKL) MOVE window
+"Ctrl + direction (jhkl) set cursor to window
+"swap windows with command :ball , vertical ball
+"
+"
+"
+"
+"ycm trick
+"<S-Insert>i
+"" disable auto_triggering ycm suggestions pane and instead
+" use semantic completion only on Ctrl+n
+" let ycm_trigger_key = '<C-n>'
+" let g:ycm_auto_trigger = 0
+" let g:ycm_key_invoke_completion = ycm_trigger_key
+
+" this is some arcane magic to allow cycling through the YCM options
+" with the same key that opened it.
+" See http://vim.wikia.com/wiki/Improve_completion_popup_menu for more info.
+" let g:ycm_key_list_select_completion = ['<TAB>', '<C-j>']
+" inoremap <expr> ycm_trigger_key pumvisible() ? "<C-j>" : ycm_trigger_key;
+"
+"
+" if !exists("my_auto_commands_loaded")
+  " let my_auto_commands_loaded = 1
+  " " > 100M
+  " let g:LargeFile = 1024 * 1024 * 100
+  " augroup LargeFile
+    " autocmd BufReadPre * call LargeFiles()
+  " augroup END
+" endif
+" 
+  " 
+" function! LargeFile()
+	" let f=expand('<afile>')
+	" if getfsize(f) > g:LargeFile
+		" echom 'set large file'
+		" set eventignore+=FileType
+		" setlocal noswapfile bufhidden=unload undolevels=-1
+	" else
+		" echom 'unset large file'
+		" set eventignore-=FileType
+	" endif
+" endfunction
+"
+"
+"
+"
+" maybe try
+"
+" Text objects
+  " Plug 'kana/vim-textobj-user'
+  " Plug 'kana/vim-textobj-entire'
+  " Plug 'kana/vim-textobj-indent'
+  " Plug 'kana/vim-textobj-line'
+  " Plug 'kana/vim-textobj-function'
+  " Plug 'kana/vim-textobj-fold'
+  " Plug 'beloglazov/vim-textobj-quotes'
+  " Plug 'kana/vim-textobj-syntax'
+  " Plug 'jceb/vim-textobj-uri'
+  " Plug 'Julian/vim-textobj-variable-segment'
+  " Plug 'Julian/vim-textobj-brace'
+" Plug 'adriaanzon/vim-textobj-matchit'
+" Wrapping{{{
+"
+"
+"
+
+" Disable spell checking by default
+" set nospell
+" 
+" set spelllang=en
+" 
+" " Dict with words marked as good/wrong
+" set spellfile=~/.vim/spell/dict.utf-8.add
+"
+"
+"
+"
+"
+" Enable true color support
+if &t_Co >= 256 || has("gui_running")
+  "let g:dracula_italic=0
+  let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+  let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
+
+  if (has("termguicolors"))
+    set termguicolors
+  endif
+endif

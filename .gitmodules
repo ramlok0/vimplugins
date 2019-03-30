@@ -154,3 +154,9 @@
 [submodule "LanguageClient-neovim"]
 	path = LanguageClient-neovim
 	url = https://github.com/autozimu/LanguageClient-neovim.git
+[submodule "quickmenu.vim"]
+	path = quickmenu.vim
+	url = https://github.com/skywind3000/quickmenu.vim.git
+[submodule "vim-airline-themes"]
+	path = vim-airline-themes
+	url = https://github.com/vim-airline/vim-airline-themes.git
