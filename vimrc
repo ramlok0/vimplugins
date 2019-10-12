@@ -4,68 +4,81 @@ endif
 
 filetype plugin on
 
+set modelines=0
+set nomodeline
+
 set clipboard=unnamedplus
 " execute pathogen#infect()
 call plug#begin('~/.vim/bundle')
 " Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
+Plug 'junegunn/vim-peekaboo'
+Plug 'tomtom/tcomment_vim'
 Plug 'vim-scripts/YankRing.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
-Plug 'pbogut/fzf-mru.vim.git'
+Plug 'pbogut/fzf-mru.vim'
 Plug '~/.vim/bundle/molokai'
-Plug 'zefei/vim-colortuner.git', { 'on': 'Colortuner' }
-Plug 'xolox/vim-notes.git'
-Plug 'xolox/vim-misc.git'
+Plug 'zefei/vim-colortuner', { 'on': 'Colortuner' }
+Plug 'xolox/vim-notes'
+Plug 'xolox/vim-misc'
 Plug 'markonm/traces.vim'
 Plug 'justinmk/vim-sneak'
 " Plug 'autozimu/LanguageClient-neovim', { 'on': 'LanguageClientStart' }
-Plug 'autozimu/LanguageClient-neovim'
-" Plug 'tomasr/molokai.git' " now it's ok in plug menu...but it won't update
-Plug 'simnalamburt/vim-mundo.git', { 'on': 'MundoToggle' }
-Plug 'ronakg/quickr-cscope.vim.git'
-" Plug 'octol/vim-cpp-enhanced-highlight.git', { 'for': 'cpp' } "maybe I am ok with just c.vim in .vim/syntax
+ Plug 'autozimu/LanguageClient-neovim', {
+     \ 'branch': 'next',
+     \ 'do': 'bash install.sh',
+     \ }
+" Plug 'tomasr/molokai' " now it's ok in plug menu...but it won't update
+Plug 'simnalamburt/vim-mundo', { 'on': 'MundoToggle' }
+Plug 'ronakg/quickr-cscope.vim'
+" Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' } "maybe I am ok with just c.vim in .vim/syntax
 Plug 'severin-lemaignan/vim-minimap', { 'on': 'Minimap' }
-Plug 'majutsushi/tagbar.git', { 'for': 'cpp' }
-Plug 'vim-airline/vim-airline.git'
+Plug 'majutsushi/tagbar', { 'for': 'cpp' }
+Plug 'vim-airline/vim-airline'
 Plug '~/.vim/bundle/highlight'
-Plug 'ntpeters/vim-better-whitespace.git'
-Plug 'derekwyatt/vim-fswitch.git'
-Plug 'airblade/vim-gitgutter.git'
+Plug 'ntpeters/vim-better-whitespace'
+Plug 'derekwyatt/vim-fswitch'
+Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-sleuth'
-Plug 'Valloric/YouCompleteMe.git', { 'for': 'cpp' }
-" Plug 'tpope/vim-fugitive.git', { 'on': 'Gdiff' }
-" Plug 'tommcdo/vim-fugitive-blame-ext.git', { 'on': 'Gdiff' }
-Plug 'tpope/vim-fugitive.git'
-Plug 'tommcdo/vim-fugitive-blame-ext.git'
-Plug 'terryma/vim-multiple-cursors.git'
-Plug 'scrooloose/nerdtree.git', { 'on': 'NERDTreeToggle' }
-Plug 'tommcdo/vim-exchange.git'
-Plug 'tpope/vim-abolish.git'
-Plug 'skywind3000/asyncrun.vim.git'
-Plug 'ramele/agrep.git', { 'on': 'Agrep' }
-Plug 'rdnetto/YCM-Generator.git', { 'for': 'cpp' }
-Plug 'wellle/targets.vim.git'
-Plug 'junegunn/vim-easy-align.git'
-Plug 'rhysd/clever-f.vim.git'
-Plug 'tpope/vim-surround.git'
-Plug 'adelarsq/vim-matchit.git'
-Plug 'dyng/ctrlsf.vim.git', { 'on': 'CtrlSF' }
-Plug 'brooth/far.vim.git', { 'on': 'Far' }
-Plug 'will133/vim-dirdiff.git', { 'on': 'DirDiff' }
-Plug 'mh21/errormarker.vim.git'
-Plug 'wincent/ferret.git'
-Plug 'devjoe/vim-codequery.git', { 'for': 'cpp' }
-Plug 'prabirshrestha/vim-lsp.git', { 'for': 'cpp' }
-Plug 'pdavydov108/vim-lsp-cquery.git', { 'for': 'cpp' }
-" Plug 'pdavydov108/vim-lsp-cquery.git'
-Plug 'prabirshrestha/async.vim.git'
-Plug 'osyo-manga/vim-over.git'
-Plug 'jiangmiao/auto-pairs.git'
-Plug 'jremmen/vim-ripgrep.git'
+Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-completer --system-libclang' }
+" Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-completer' }
+" Plug 'tpope/vim-fugitive', { 'on': 'Gdiff' }
+" Plug 'tommcdo/vim-fugitive-blame-ext', { 'on': 'Gdiff' }
+Plug 'tpope/vim-fugitive'
+Plug 'tommcdo/vim-fugitive-blame-ext'
+Plug 'terryma/vim-multiple-cursors'
+Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+Plug 'tommcdo/vim-exchange'
+Plug 'tpope/vim-abolish'
+Plug 'skywind3000/asyncrun.vim'
+Plug 'ramele/agrep', { 'on': 'Agrep' }
+Plug 'rdnetto/YCM-Generator', { 'for': 'cpp' }
+Plug 'wellle/targets.vim'
+Plug 'junegunn/vim-easy-align'
+Plug 'rhysd/clever-f.vim'
+Plug 'tpope/vim-surround'
+Plug 'adelarsq/vim-matchit'
+Plug 'dyng/ctrlsf.vim', { 'on': 'CtrlSF' }
+Plug 'brooth/far.vim', { 'on': 'Far' }
+Plug 'will133/vim-dirdiff', { 'on': 'DirDiff' }
+Plug 'mh21/errormarker.vim'
+Plug 'wincent/ferret'
+Plug 'devjoe/vim-codequery', { 'for': 'cpp' }
+Plug 'prabirshrestha/vim-lsp', { 'for': 'cpp' }
+Plug 'pdavydov108/vim-lsp-cquery', { 'for': 'cpp' }
+" Plug 'pdavydov108/vim-lsp-cquery'
+Plug 'prabirshrestha/async.vim'
+Plug 'osyo-manga/vim-over'
+Plug 'jiangmiao/auto-pairs'
+Plug 'jremmen/vim-ripgrep'
 Plug 'skywind3000/quickmenu.vim'
-Plug 'cohama/agit.vim.git', { 'on': 'Agit' }
+Plug 'cohama/agit.vim', { 'on': 'Agit' }
 Plug '~/.vim/bundle/startupFn'
 Plug 'vim-airline/vim-airline-themes'
+Plug 'https://gitlab.com/Lenovsky/nuake.git'
+Plug 'zirrostig/vim-schlepp'
+Plug 'vim-scripts/vis.git'
+"https://github.com/t9md/vim-textmanip maybe better moving of blocks with insert/replace
 call plug#end()
 
 let g:quickr_cscope_autoload_db = 0
@@ -80,20 +93,41 @@ elseif has('nvim')
 endif
 
 
+"data for plugin quickMenu
+" call g:quickmenu#append('LspHover', 'LspHover', '')
+" call g:quickmenu#append('LspCCaller', 'LspCqueryCallers', '')
+" call g:quickmenu#append('LspDef', 'LspDefinition', '')
+" call g:quickmenu#append('LspDiag', 'LspDocumentDiagnostics', '')
+" call g:quickmenu#append('LangSMenu', 'call LanguageClient_contextMenu()', '')
+" call g:quickmenu#append('LangSHover', 'call LanguageClient#textDocument_hover()', '')
+" call g:quickmenu#append('LangSImpl', 'call LanguageClient#textDocument_implementation()', '')
+" call g:quickmenu#append('LangSRefs', 'call LanguageClient#textDocument_references()', '')
+" call g:quickmenu#append('LangSTypeDef', 'call LanguageClient#textDocument_typeDefinition()', '')
+" call g:quickmenu#append('LangSDef', 'call LanguageClient#textDocument_definition()', '')
+" call g:quickmenu#append('LangSCaller', "call LanguageClient#findLocations({'method':'$ccls/call'})", '')
+" call g:quickmenu#append('TraceHide', 'call TraceHide("SIP\ Signalling\\|Conversation*\\|CallView*")', '')
 
-call g:quickmenu#append('LspHover', 'LspHover', '')
-call g:quickmenu#append('LspCCaller', 'LspCqueryCallers', '')
-call g:quickmenu#append('LspDef', 'LspDefinition', '')
-call g:quickmenu#append('LspDiag', 'LspDocumentDiagnostics', '')
-call g:quickmenu#append('LangSMenu', 'call LanguageClient_contextMenu()', '')
-call g:quickmenu#append('LangSHover', 'call LanguageClient#textDocument_hover()', '')
-call g:quickmenu#append('LangSImpl', 'call LanguageClient#textDocument_implementation()', '')
-call g:quickmenu#append('LangSRefs', 'call LanguageClient#textDocument_references()', '')
-call g:quickmenu#append('LangSTypeDef', 'call LanguageClient#textDocument_typeDefinition()', '')
-call g:quickmenu#append('LangSDef', 'call LanguageClient#textDocument_definition()', '')
-call g:quickmenu#append('LangSCaller', "call LanguageClient#findLocations({'method':'$ccls/call'})", '')
-call g:quickmenu#append('TraceHide', 'call TraceHide("SIP\ Signalling\\|Conversation*\\|CallView*")', '')
+let g:execMenu = {
+  \ "LangServer Menu":           "call LanguageClient_contextMenu()",
+  \ "LangServer Hover":          "call LanguageClient#textDocument_hover()",
+  \ "LangServer Implementation": "call LanguageClient#textDocument_implementation()",
+  \ "LangServer References":     "call LanguageClient#textDocument_references()",
+  \ "LangServer TypeDef":        "call LanguageClient#textDocument_typeDefinition()",
+  \ "LangServer Definition":     "call LanguageClient#textDocument_definition()",
+  \ "TraceHide":                 "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
+  \ "LangServer Caller":         "call LanguageClient#findLocations({\'method\':\'$ccls/call\'})",
+  \}
 
+function ShowExecMenu()
+  call fzf#run({'source':keys(g:execMenu), 'down': '30%', 'sink': function('ExecMenuSelection')})
+endfunction
+
+function ExecMenuSelection(expr)
+  execute g:execMenu[a:expr]
+endfunction
+
+"missing
+"call LanguageClient#findLocations({'method':'$ccls/call-hierarchy'})<cr>
 "language server options
 "nn <silent> xb :call LanguageClient#findLocations({'method':'$ccls/inheritance'})<cr>
 " bases of up to 3 levels
@@ -153,6 +187,18 @@ xnoremap # :<C-u>call <SID>VSetSearch('?')<CR>?<C-R>=@/<CR><CR>
 
 "}}}
 
+" yankring turn off default setup
+let g:yankring_paste_v_bkey = ''
+let g:yankring_paste_v_akey = ''
+let g:yankring_paste_n_bkey = ''
+let g:yankring_paste_n_akey = ''
+let g:yankring_paste_v_key = ''
+let g:yankring_manage_numbered_reg = 0
+let g:yankring_clipboard_monitor = 0
+let g:yankring_paste_check_default_buffer = 0
+let g:yankring_zap_keys = ''
+
+
 "##########################
 " Join lines and keep the cursor in place
 " nnoremap J mzJ`z
@@ -192,13 +238,22 @@ nnoremap # #zvzz
 " Normalize Y behavior to yank till the end of line
 nnoremap Y y$
 
-
+"##############
+"auto select visual block after indenting
+vnoremap < <gv
+vnoremap > >gv
+vnoremap <Tab> >gv
+vnoremap <S-Tab> <LT>gv
+nnoremap <Tab> >>
+nnoremap <S-Tab> <LT><LT>
+inoremap <S-Tab> <C-O><LT><LT>
 "##########################
 " Open diffs in vertical splits
 " Use 'xdiff' library options: patience algorithm with indent-heuristics (same to Git options)
 " NOTE: vim uses the external diff utility which doesn't do word diffs nor can it find moved-and-modified lines.
 " See: https://stackoverflow.com/questions/36519864/the-way-to-improve-vimdiff-similarity-searching-mechanism
-set diffopt=internal,filler,vertical,context:5,foldcolumn:1,indent-heuristic,algorithm:patience
+" set diffopt=internal,filler,vertical,context:5,foldcolumn:1,indent-heuristic,algorithm:patience
+" set diffopt=internal,filler,vertical,context:5,foldcolumn:1
 
 
 "##########################
@@ -298,10 +353,10 @@ function! LoadTags()
     let g:currentTagFilePath = l:path
     call SetTags(l:path)
   endif
-  if (g:lspLoaded == "")
-    let g:lspLoaded = "true"
-    call lsp#enable()
-  endif
+  " if (g:lspLoaded == "")
+    " let g:lspLoaded = "true"
+    " call lsp#enable()
+  " endif
   " exec LanguageClientStart"
 endfunction
 
@@ -459,7 +514,11 @@ endif
 " noremap <C-j> :call GetLastGitFiles()<CR>
 let g:defaultTraceText = "printf"
 " let g:traceText = "OPERA_ERROR"
-noremap <C-l> :call InsertMethodTrace()<CR>
+noremap <C-l> :call InsertMethodTrace("int")<CR>
+noremap <C-P> :call InsertMethodTrace("none")<CR>
+nnoremap <silent> ,l :call InsertMethodTrace("int")<CR>
+nnoremap <silent> ,; :call InsertMethodTrace("str")<CR>
+nnoremap <silent> ,' :call InsertMethodTrace("none")<CR>
 " noremap <C-f> :Files ~/phones_GIT/vobs/<CR>
 let g:CommandTFileScanner="find"
 "show class details
@@ -482,8 +541,14 @@ nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F8> :TagbarToggle<CR>
 nmap <F9> :MundoToggle<CR>
 nmap <F10> :YRShow<CR>
-noremap <silent><F11> :call quickmenu#toggle(0)<cr>
+" noremap <silent><F11> :call quickmenu#toggle(0)<cr>
+noremap <silent><F11> :call ShowExecMenu()<cr>
+nnoremap <silent>,mm :call ShowExecMenu()<cr>
 nnoremap <silent> ,yy :YRShow<CR>
+nnoremap <F12> :Nuake<CR>
+inoremap <F12> <C-\><C-n>:Nuake<CR>
+tnoremap <F12> <C-\><C-n>:Nuake<CR>
+nnoremap <silent> ,tt :Nuake<CR>
 " nmap ,rr  :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 10<CR>
 " nmap ,ll  :let g:phones="121 122 123" \| let g:branch="mainline"
 "nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
@@ -495,12 +560,21 @@ nnoremap <silent> ,yy :YRShow<CR>
 " " bubble selected lines
 " vmap <C-Up> [egv
 " vmap <C-Down> ]egv
+"
+" move line good
 nnoremap <C-Down> :m .+1<CR>==
 nnoremap <C-Up> :m .-2<CR>==
 inoremap <C-Down> <Esc>:m .+1<CR>==gi
 inoremap <C-Up> <Esc>:m .-2<CR>==gi
-vnoremap <C-Down> :m '>+1<CR>gv=gv
-vnoremap <C-Up> :m '<-2<CR>gv=gv
+" vnoremap <C-Down> :m '>+1<CR>gv=gv
+" vnoremap <C-Up> :m '<-2<CR>gv=gv
+
+vmap <C-Up>  <Plug>SchleppUp
+vmap <C-Down> <Plug>SchleppDown
+vmap <C-Left> <Plug>SchleppLeft
+vmap <C-Right>  <Plug>SchleppRight
+
+
 
 "switch windows
 nnoremap <A-Left> <C-w>h
@@ -516,16 +590,16 @@ nnoremap <silent> ,nn :enew<CR>
 nnoremap <silent> ,ne :enew<CR>
 
 
-nnoremap <silent> ,ld :LspDefinition<CR>
-nnoremap <silent> ,lh :LspHover<CR>
-nnoremap <silent> ,ls :LspReferences<CR>
-nnoremap <silent> ,lc :LspCqueryCallers<CR>
+" nnoremap <silent> ,ld :LspDefinition<CR>
+" nnoremap <silent> ,lh :LspHover<CR>
+" nnoremap <silent> ,ls :LspReferences<CR>
+" nnoremap <silent> ,lc :LspCqueryCallers<CR>
 " rename files from quicfix window
 nnoremap <silent> ,qr :call QfToRename()<CR>
 nnoremap <silent> ,qf :CodeQueryFilter !  
 
-nnoremap <silent> ,lh call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent> ,lh call LanguageClient#findLocations({'method':'$ccls/call'})<CR>
+" nnoremap <silent> ,lh call LanguageClient#textDocument_hover()<CR>
+" nnoremap <silent> ,lh call LanguageClient#findLocations({'method':'$ccls/call'})<CR>
 
 
 nnoremap <silent> ,cs :CodeQuery Symbol<CR>
@@ -911,7 +985,8 @@ if &term =~ "xterm\\|rxvt"
   let &t_SI .= "\<Esc>[5 q"
   " solid block
   let &t_EI .= "\<Esc>[2 q"
-  silent !echo -ne "\033]12;red\007"
+  " silent !echo -ne "\033]12;red\007"
+  silent !echo -ne "\033]12;green\007"
   " reset cursor when vim exits
   autocmd VimLeave * silent !echo -ne "\033]112\007"
   " use \003]12;gray\007 for gnome-terminal and rxvt up to version 9.21

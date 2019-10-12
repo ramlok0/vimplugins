@@ -17,6 +17,12 @@ function! TraceHighlightSIP()
   Highlight 23 SessionController(.\{-}:
 endfunction
 
+"better way
+"hi JapaneseStringHighlight guibg=#FDF6E3 guifg=#D33682
+" match JapaneseStringHighlight "[^\x00-\x7F]"
+
+" highlight LOL ctermbg=red
+" call matchadd("LOL", "this")
 
 ":highlight - list of available color
 " call matchadd('color','expr',-1) "-1 will be overridden by search highlight
@@ -303,7 +309,13 @@ endfunction
 "        let methodName_end = getpos(")")[2]
 "http://ricostacruz.com/cheatsheets/vimscript
 let g:traceStringFound={}
-function! InsertMethodTrace()
+function! InsertMethodTrace(expr)
+  if a:expr == ""
+    let l:traceType="int"
+  else
+    let l:traceType=a:expr
+  endif
+    
   let l:currentWord = expand("<cword>")
   if len(l:currentWord) < 3
     let l:currentWord = ""
@@ -341,6 +353,10 @@ function! InsertMethodTrace()
   " execute 'silent s/\v^(\s*)/\1' . g:traceText . '(\"xx - ' . output . ' -> \\n\");'
   if empty(l:param) || l:param==""
     execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> \n");'
+  elseif l:traceType == "str"
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> ' . l:param . ' %s \n",' . l:param . '.c_str()' . ');'
+  elseif l:traceType == "none"
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> ' . l:param . ' \n"' . ');'
   else
     execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> ' . l:param . ' %i \n",' . l:param . ');'
   endif
@@ -962,6 +978,7 @@ let s:comment_map = {
     \   "ahk": ';',
     \   "vim": '"',
     \   "tex": '%',
+    \   "xml": '<\!--',
     \ }
 
 function! ToggleComment()
@@ -988,6 +1005,7 @@ function! UnToggleComment()
       else
         let comment_leader = "#"
       endif
+      echom "got " . comment_leader
       execute 'silent s/\v\s*\zs' . comment_leader . '\s*\ze//e'
 endfunction
 
@@ -1849,4 +1867,51 @@ endfunction
 " set bexpr=MyBalloonExpr()
 " set ballooneval
 " set bevalterm
+
+
+
+
+
+" Tabulate the selected text
+" Requires column utility
+function! Tabulate() range abort
+	let firstlinum = a:firstline
+	let lastlinum = a:lastline
+	call inputsave()
+	let delim = input("Enter delimiter: ")
+	call inputrestore()
+	redraw!
+	let maxlen = max(map(range(firstlinum, lastlinum), "virtcol([v:val, '$'])")) - 1
+	for linum in range(firstlinum, lastlinum)
+		let len = virtcol([linum, '$']) - 1
+		exe "norm! ".linum."ggA".repeat("\<Space>", (maxlen - len))."\<Esc>"
+	endfor
+	silent exe firstlinum.",".lastlinum."s/".delim."/".delim."\|  /g"
+	silent exe firstlinum.",".lastlinum."!column -s'".delim."' -t"
+	silent exe firstlinum.",".lastlinum."s/^/|  /"
+	silent exe firstlinum.",".lastlinum."s/$/  |/"
+	let maxlen = max(map(range(firstlinum, lastlinum), "virtcol([v:val, '$'])")) - 1
+	exe "norm! ".firstlinum."ggO+".repeat("-", maxlen-2)."+\<Esc>"
+	let firstlinum += 1
+	let lastlinum += 1
+	exe "norm! ".lastlinum."ggo+".repeat("-", maxlen-2)."+\<Esc>"
+endfunction
+
+
+"for simple char in insert mode use C-k letter [:^`]
+function! InsertChar(expr)
+  let l:data = split(a:expr)[1]
+  echom l:data
+  execute 'normal a' . l:data
+endfunction
+
+function! SearchDigraph()
+  redir => data
+    silent digraph
+  redir END
+  let data = substitute(data,'\%x00', '','') " remove first null char
+  let data = substitute(data,'\%x00', ' ','g') "replace all other null chars with space
+  let data = split(data, ' \+\d\+\s\+')
+  call fzf#run({'source': data, 'down': '30%', 'sink': function('InsertChar')})
+endfunction
 

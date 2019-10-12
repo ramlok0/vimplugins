@@ -160,3 +160,18 @@
 [submodule "vim-airline-themes"]
 	path = vim-airline-themes
 	url = https://github.com/vim-airline/vim-airline-themes.git
+[submodule "nuake"]
+	path = nuake
+	url = https://github.com/Lenovsky/nuake.git
+[submodule "vim-schlepp"]
+	path = vim-schlepp
+	url = https://github.com/zirrostig/vim-schlepp.git
+[submodule "vis"]
+	path = vis
+	url = https://github.com/vim-scripts/vis.git
+[submodule "vim-peekaboo"]
+	path = vim-peekaboo
+	url = https://github.com/junegunn/vim-peekaboo.git
+[submodule "tcomment_vim"]
+	path = tcomment_vim
+	url = https://github.com/tomtom/tcomment_vim.git
