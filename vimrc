@@ -1207,3 +1207,8 @@ if &t_Co >= 256 || has("gui_running")
     set termguicolors
   endif
 endif
+
+
+" do not overwrite git modify signs with error signs - youcompleteme
+let g:ycm_enable_diagnostic_signs = 0
+let g:ycm_enable_diagnostic_highlighting = 1
