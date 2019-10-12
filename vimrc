@@ -76,9 +76,9 @@ Plug 'skywind3000/quickmenu.vim'
 Plug 'cohama/agit.vim', { 'on': 'Agit' }
 Plug '~/.vim/bundle/startupFn'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'https://gitlab.com/Lenovsky/nuake.git'
+Plug 'Lenovsky/nuake'
 Plug 'zirrostig/vim-schlepp'
-Plug 'vim-scripts/vis.git'
+Plug 'vim-scripts/vis'
 "https://github.com/t9md/vim-textmanip maybe better moving of blocks with insert/replace
 call plug#end()
 
