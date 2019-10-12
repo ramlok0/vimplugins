@@ -175,3 +175,6 @@
 [submodule "tcomment_vim"]
 	path = tcomment_vim
 	url = https://github.com/tomtom/tcomment_vim.git
+[submodule "vim-clap"]
+	path = vim-clap
+	url = https://github.com/liuchengxu/vim-clap.git

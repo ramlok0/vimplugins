@@ -10,6 +10,7 @@ set nomodeline
 set clipboard=unnamedplus
 " execute pathogen#infect()
 call plug#begin('~/.vim/bundle')
+Plug 'liuchengxu/vim-clap'
 " Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'junegunn/vim-peekaboo'
 Plug 'tomtom/tcomment_vim'
