@@ -463,6 +463,7 @@ endfunction
 
 let g:taskDone=""
 function! GetOutputGui(expr)
+  echom "GetOutputGui xx"
   if type(a:expr) == 3
     echom "getoutput gui >"join(a:expr)"<"
   else
@@ -562,6 +563,7 @@ endfunction
 
 let g:lastSearch=""
 function! BrowseFolderGuix(expr)
+  echom "BrowseFolderGuix xx"
   let a:search=""
   echom "BrowseFolderGui "a:expr
     call fzf#run({'source': 'ls -1 -d ' . a:expr . '/*/', 'sink*': function('GetOutputGui'), 'options': '--expect=ctrl-x,ctrl-f'})
@@ -569,6 +571,7 @@ endfunction
 
 let g:taskDone=""
 function! GetOutputGuix(expr)
+  echom "GetOutputGuix xx"
   if type(a:expr) == 3
     echom ">"join(a:expr)"<"
   else
@@ -1199,6 +1202,10 @@ endfunction
 command! -nargs=1 -complete=customlist,SessionsCompletion LoadSession call LoadSession(<f-args>)
 command! -nargs=1 -complete=customlist,SessionsCompletion SaveSession call SaveSession(<f-args>)
 
+" function! GetTagbarMethod()
+  " let a:data = tagbar#currenttag('%s','')
+  " return a:data
+" endfunction
 
 function! SessionName(...)
      return g:session_name
@@ -1208,6 +1215,7 @@ call airline#parts#define_accent('session_name', 'orange')
 " let g:airline_section_x = airline#section#create_right(['tagbar', 'gutentags', 'grepper','filetype','session_name'])
 " let g:airline_section_x = airline#section#create_right(['tagbar', 'gutentags', 'grepper','session_name'])
 let g:airline_section_y = airline#section#create_right(['ffenc','session_name'])
+" let g:airline_section_x = airline#section#create_right(['testBar','filetype'])
 
 function! BufferGrep()
   let currBuff=bufnr("%")
@@ -1406,7 +1414,7 @@ endfunction
 let g:gitfolder="mainline"
 function! BuildBind(expr)
   call inputsave()
-    let l:target = input( "targetPhones? (x to cancel)" . g:targetPhones . "?" )
+    let l:target = input( "targetPhones? (x to cancel, " " no upload)" . g:targetPhones . "?" )
   call inputrestore()
   if (l:target == "x")
     return
@@ -1460,7 +1468,7 @@ function! UploadFw()
   echom join(errors)
   let nrOfErrors=len(filter(getqflist(),'matchstr(v:val.text,"\\CError") != "" || matchstr(v:val.text,"error:") != ""'))
   echom "nr of errors " . nrOfErrors
-  if g:asyncrun_code == 0 && nrOfErrors == 0
+  if g:asyncrun_code == 0 && nrOfErrors == 0 && g:targetPhones != " "
     echom "trigger phones"
     exe "AsyncRun uploadFw.py ". g:gitfolder . " " . g:targetPhones
 " nmap <F1> :AsyncRun uploadFw.py mainline 120 121
@@ -1915,3 +1923,27 @@ function! SearchDigraph()
   call fzf#run({'source': data, 'down': '30%', 'sink': function('InsertChar')})
 endfunction
 
+function! LockScreen()
+  exe "windo set scrollbind"
+endfunction
+
+function! LockScreenx()
+  exe "windo set scrollbind!"
+endfunction
+
+" put selected strings in cwindow and highlight them
+function MatchAndHighlight(expr)
+  echom "start"
+  let l:data = split(a:expr," ")
+  let l:joinedData = join( l:data, "\\|" )
+  echom "joined >" . l:joinedData . "<"
+  exe "vimgrep " . l:joinedData . " %"
+
+  let l:color = "1"
+  for item in l:data
+    echom "high " . l:color . " item " . l:item
+    exe "Highlight " . l:color . " " . item
+    let l:color = l:color + 1
+  endfor
+  exe "cwin"
+endfunction

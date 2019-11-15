@@ -11,8 +11,15 @@ set clipboard=unnamedplus
 " execute pathogen#infect()
 call plug#begin('~/.vim/bundle')
 Plug 'liuchengxu/vim-clap'
+" Plug 'ap/vim-buftabline'
+Plug 'pacha/vem-tabline'
+Plug 'rbong/vim-buffest'
+Plug 'rhysd/vim-healthcheck'
+Plug 'rhysd/git-messenger.vim'
+Plug 'dhruvasagar/vim-zoom'
 " Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 Plug 'junegunn/vim-peekaboo'
+Plug 'Yilin-Yang/vim-markbar'
 Plug 'tomtom/tcomment_vim'
 Plug 'vim-scripts/YankRing.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -34,7 +41,8 @@ Plug 'simnalamburt/vim-mundo', { 'on': 'MundoToggle' }
 Plug 'ronakg/quickr-cscope.vim'
 " Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' } "maybe I am ok with just c.vim in .vim/syntax
 Plug 'severin-lemaignan/vim-minimap', { 'on': 'Minimap' }
-Plug 'majutsushi/tagbar', { 'for': 'cpp' }
+" Plug 'majutsushi/tagbar', { 'for': 'cpp' }
+Plug 'majutsushi/tagbar'
 Plug 'vim-airline/vim-airline'
 Plug '~/.vim/bundle/highlight'
 Plug 'ntpeters/vim-better-whitespace'
@@ -505,13 +513,13 @@ noremap <C-x> :FZFMru<CR>
 "noremap <C-h> :CtrlPBookmarkDir<CR>
 "noremap <C-j> :call DmenuOpen("Files")<CR>
 " noremap <C-h> :call GetGitFolder("$HOME/GIT/")<CR>
-if has("gui_running")
-  noremap <C-h> :call BrowseFolderGui("$HOME/GIT/")<CR>
-  noremap <C-j> :call BrowseFolderGui(expand('%:p:h'))<CR>
-else
-  noremap <C-h> :call BrowseFolder("$HOME/GIT")<CR>
-  noremap <C-j> :call BrowseFolder(expand('%:p:h'))<CR>
-endif
+" if has("gui_running")
+  " noremap <C-h> :call BrowseFolderGui("$HOME/GIT/")<CR>
+  " " noremap <C-j> :call BrowseFolderGui(expand('%:p:h'))<CR>
+" else
+  " noremap <C-h> :call BrowseFolder("$HOME/GIT")<CR>
+  " " noremap <C-j> :call BrowseFolder(expand('%:p:h'))<CR>
+" endif
 " noremap <C-j> :call GetLastGitFiles()<CR>
 let g:defaultTraceText = "printf"
 " let g:traceText = "OPERA_ERROR"
@@ -520,6 +528,9 @@ noremap <C-P> :call InsertMethodTrace("none")<CR>
 nnoremap <silent> ,l :call InsertMethodTrace("int")<CR>
 nnoremap <silent> ,; :call InsertMethodTrace("str")<CR>
 nnoremap <silent> ,' :call InsertMethodTrace("none")<CR>
+"lock screen
+nnoremap <silent> ,ls :call LockScreen()<CR>
+nnoremap <silent> ,lsx :call LockScreenx()<CR>
 " noremap <C-f> :Files ~/phones_GIT/vobs/<CR>
 let g:CommandTFileScanner="find"
 "show class details
@@ -583,8 +594,10 @@ nnoremap <A-Right> <C-w>l
 nnoremap <A-Up> <C-w>k
 nnoremap <A-Down> <C-w>j
 
-nnoremap <C-PageUp> gt
-nnoremap <C-PageUp> gT
+" nnoremap <C-PageUp> gt
+" nnoremap <C-PageUp> gT
+nnoremap <C-PageDown> :bn<CR>
+nnoremap <C-PageUp> :bp<CR>
 
 " new window
 nnoremap <silent> ,nn :enew<CR>
@@ -643,6 +656,15 @@ set errorformat-=%f:%l:\ %t%*[^:]:%m
 set errorformat+=%f:%l:\ error:\ %m
 let g:asyncrun_auto = "make"
 
+"function GetTagbarMethod()
+"  let a = tagbar#currenttag('%s','')
+"  return a
+"endfunction
+
+"call airline#parts#define_function('testBar', 'GetTagbarMethod')
+
+let g:tagbar_ctags_bin='ctags'
+let g:airline#extensions#tagbar#enabled = 1
 let g:asyncrun_status = ''
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
 let g:airline_theme='hybrid'
@@ -1212,3 +1234,9 @@ endif
 " do not overwrite git modify signs with error signs - youcompleteme
 let g:ycm_enable_diagnostic_signs = 0
 let g:ycm_enable_diagnostic_highlighting = 1
+let g:airline#extensions#tagbar#flags = 'f'  " show full tag hierarchy
+" popup window?
+" set completeopt+=popup
+" set previewpopup=height:10,width:60
+" set completeopt+=preview
+" let g:airline#extensions#tabline#enabled = 1
