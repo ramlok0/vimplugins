@@ -10,24 +10,28 @@ set nomodeline
 set clipboard=unnamedplus
 " execute pathogen#infect()
 call plug#begin('~/.vim/bundle')
-Plug 'liuchengxu/vim-clap'
+" Plug 'liuchengxu/vim-clap'
 " Plug 'ap/vim-buftabline'
-Plug 'pacha/vem-tabline'
+" Plug 'pacha/vem-tabline'
+" edit macros
 Plug 'rbong/vim-buffest'
 Plug 'rhysd/vim-healthcheck'
-Plug 'rhysd/git-messenger.vim'
-Plug 'dhruvasagar/vim-zoom'
+Plug 'mg979/vim-visual-multi'
+Plug 'mptre/vim-printf'
+"comming info under cursor
+" Plug 'rhysd/git-messenger.vim'
+" Plug 'dhruvasagar/vim-zoom'
 " Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
-Plug 'junegunn/vim-peekaboo'
-Plug 'Yilin-Yang/vim-markbar'
+" Plug 'junegunn/vim-peekaboo'
+" Plug 'Yilin-Yang/vim-markbar'
 Plug 'tomtom/tcomment_vim'
 Plug 'vim-scripts/YankRing.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'pbogut/fzf-mru.vim'
 Plug '~/.vim/bundle/molokai'
-Plug 'zefei/vim-colortuner', { 'on': 'Colortuner' }
-Plug 'xolox/vim-notes'
+" Plug 'zefei/vim-colortuner', { 'on': 'Colortuner' }
+" Plug 'xolox/vim-notes'
 Plug 'xolox/vim-misc'
 Plug 'markonm/traces.vim'
 Plug 'justinmk/vim-sneak'
@@ -37,15 +41,16 @@ Plug 'justinmk/vim-sneak'
      \ 'do': 'bash install.sh',
      \ }
 " Plug 'tomasr/molokai' " now it's ok in plug menu...but it won't update
-Plug 'simnalamburt/vim-mundo', { 'on': 'MundoToggle' }
+" Plug 'simnalamburt/vim-mundo', { 'on': 'MundoToggle' }
 Plug 'ronakg/quickr-cscope.vim'
 " Plug 'octol/vim-cpp-enhanced-highlight', { 'for': 'cpp' } "maybe I am ok with just c.vim in .vim/syntax
-Plug 'severin-lemaignan/vim-minimap', { 'on': 'Minimap' }
+" Plug 'severin-lemaignan/vim-minimap', { 'on': 'Minimap' }
 " Plug 'majutsushi/tagbar', { 'for': 'cpp' }
 Plug 'majutsushi/tagbar'
 Plug 'vim-airline/vim-airline'
 Plug '~/.vim/bundle/highlight'
 Plug 'ntpeters/vim-better-whitespace'
+"show header file for cpp
 Plug 'derekwyatt/vim-fswitch'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-sleuth'
@@ -56,23 +61,24 @@ Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-compl
 Plug 'tpope/vim-fugitive'
 Plug 'tommcdo/vim-fugitive-blame-ext'
 Plug 'terryma/vim-multiple-cursors'
-Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
+" Plug 'scrooloose/nerdtree', { 'on': 'NERDTreeToggle' }
 Plug 'tommcdo/vim-exchange'
 Plug 'tpope/vim-abolish'
 Plug 'skywind3000/asyncrun.vim'
 Plug 'ramele/agrep', { 'on': 'Agrep' }
-Plug 'rdnetto/YCM-Generator', { 'for': 'cpp' }
+" Plug 'rdnetto/YCM-Generator', { 'for': 'cpp' }
 Plug 'wellle/targets.vim'
 Plug 'junegunn/vim-easy-align'
-Plug 'rhysd/clever-f.vim'
+" Plug 'rhysd/clever-f.vim'
 Plug 'tpope/vim-surround'
-Plug 'adelarsq/vim-matchit'
+" jump between if else as if {  } do I use it?
+" Plug 'adelarsq/vim-matchit'
 Plug 'dyng/ctrlsf.vim', { 'on': 'CtrlSF' }
 Plug 'brooth/far.vim', { 'on': 'Far' }
 Plug 'will133/vim-dirdiff', { 'on': 'DirDiff' }
 Plug 'mh21/errormarker.vim'
 Plug 'wincent/ferret'
-Plug 'devjoe/vim-codequery', { 'for': 'cpp' }
+" Plug 'devjoe/vim-codequery', { 'for': 'cpp' }
 Plug 'prabirshrestha/vim-lsp', { 'for': 'cpp' }
 Plug 'pdavydov108/vim-lsp-cquery', { 'for': 'cpp' }
 " Plug 'pdavydov108/vim-lsp-cquery'
@@ -85,7 +91,9 @@ Plug 'cohama/agit.vim', { 'on': 'Agit' }
 Plug '~/.vim/bundle/startupFn'
 Plug 'vim-airline/vim-airline-themes'
 Plug 'Lenovsky/nuake'
+" move selected line up/down
 Plug 'zirrostig/vim-schlepp'
+" do in selection B or search S
 Plug 'vim-scripts/vis'
 "https://github.com/t9md/vim-textmanip maybe better moving of blocks with insert/replace
 call plug#end()
@@ -524,10 +532,10 @@ noremap <C-x> :FZFMru<CR>
 let g:defaultTraceText = "printf"
 " let g:traceText = "OPERA_ERROR"
 noremap <C-l> :call InsertMethodTrace("int")<CR>
-noremap <C-P> :call InsertMethodTrace("none")<CR>
-nnoremap <silent> ,l :call InsertMethodTrace("int")<CR>
-nnoremap <silent> ,; :call InsertMethodTrace("str")<CR>
-nnoremap <silent> ,' :call InsertMethodTrace("none")<CR>
+vnoremap <C-l> :call InsertMethodTracev("")<CR>
+" noremap <C-P> :call InsertMethodTrace("none")<CR>
+nnoremap <silent> ,l :call InsertMethodTrace("str")<CR>
+nnoremap <silent> ,; :call InsertMethodTrace("none")<CR>
 "lock screen
 nnoremap <silent> ,ls :call LockScreen()<CR>
 nnoremap <silent> ,lsx :call LockScreenx()<CR>
@@ -616,9 +624,9 @@ nnoremap <silent> ,qf :CodeQueryFilter !
 " nnoremap <silent> ,lh call LanguageClient#findLocations({'method':'$ccls/call'})<CR>
 
 
-nnoremap <silent> ,cs :CodeQuery Symbol<CR>
-nnoremap <silent> ,cc :CodeQuery Call<CR>
-nnoremap <silent> ,cd :CodeQuery Definition<CR>
+" nnoremap <silent> ,cs :CodeQuery Symbol<CR>
+" nnoremap <silent> ,cc :CodeQuery Call<CR>
+" nnoremap <silent> ,cd :CodeQuery Definition<CR>
 "nnoremap <silent> ,cc :call ToggleComment()<CR>
 "vnoremap <silent> ,cu :call ToggleComment()<CR>
 " noremap  <silent> ,cc :call ToggleComment()<CR>
@@ -1240,3 +1248,62 @@ let g:airline#extensions#tagbar#flags = 'f'  " show full tag hierarchy
 " set previewpopup=height:10,width:60
 " set completeopt+=preview
 " let g:airline#extensions#tabline#enabled = 1
+"
+"
+"
+"multi cursor config
+"https://github.com/mg979/vim-visual-multi
+
+let g:VM_mouse_mappings             = 1
+let g:VM_theme                      = 'iceblue'
+let g:VM_highlight_matches          = 'underline'
+
+let g:VM_maps                       = {}
+let g:VM_maps["Undo"]               = 'u'
+let g:VM_maps["Redo"]               = '<C-r>'
+
+let g:VM_maps["Select l"]           = '<S-Right>'
+let g:VM_maps["Select h"]           = '<S-Left>'
+
+
+set formatoptions+=j " Delete comment character when joining commented lines
+
+
+" cscope
+function! Cscope(option, query)
+  let color = '{ x = $1; $1 = ""; z = $3; $3 = ""; printf "\033[34m%s\033[0m:\033[31m%s\033[0m\011\033[37m%s\033[0m\n", x,z,$0; }'
+  let l:path = expand('%:p:h')
+  let l:path = substitute(l:path,'vobs.*','','')
+  let l:cspath = l:path . "/vobs/cscope.files"
+  echom "query " . a:query
+  echom "option " . a:option
+  echom "path " . l:cspath
+  let opts = {
+  \ 'source':  "cscope -f" . l:cspath . " " . " -dL" . a:option . " " . a:query . " | awk '" . color . "'",
+  \ 'options': ['--ansi', '--prompt', '> ',
+  \             '--multi', '--bind', 'alt-a:select-all,alt-d:deselect-all',
+  \             '--color', 'fg:188,fg+:222,bg+:#3a3a3a,hl+:104'],
+  \ 'down': '40%'
+  \ }
+  function! opts.sink(lines) 
+    let data = split(a:lines)
+    let file = split(data[0], ":")
+    execute 'e ' . '+' . file[1] . ' ' . file[0]
+  endfunction
+  call fzf#run(opts)
+endfunction
+
+" Invoke command. 'g' is for call graph, kinda.
+nnoremap <silent> ,gg :call Cscope('3', expand('<cword>'))<CR>
+
+
+
+augroup! exitGr
+  au VimLeave * :call UpdateSession(); sleep 3
+augroup END
+
+
+command! -range=% TR let b:wv = winsaveview() |
+            \ keeppattern <line1>,<line2>s/\s\+$// |
+            \ call winrestview(b:wv)
+

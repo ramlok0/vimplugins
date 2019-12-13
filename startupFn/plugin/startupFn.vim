@@ -366,6 +366,77 @@ function! InsertMethodTrace(expr)
 ""  call search("\\%" . lnum . "l" . "\\%" . col . "c")
 endfunction
 
+
+function! InsertMethodTracev(expr)
+  if a:expr == ""
+    let l:traceType="int"
+  else
+    let l:traceType=a:expr
+  endif
+
+  let l:traceText=""
+  let l:params=""
+  let l:currentText=GetVisualSelectionText()
+  let l:textList = split( l:currentText, "," )
+  for it in l:textList
+    let l:test=split(it," ")
+    if len(l:test) > 1
+      let l:item=l:test[-1]
+    else
+      let l:item=it
+    endif
+
+    if len(l:item) < 3
+      continue
+    endif
+    call inputsave()
+      let l:type = input( "item type %(i/s/p): <" . l:item . "> " )
+    call inputrestore()
+    if empty(l:type)
+      let l:type="%i"
+    else
+      let l:type="%" . l:type
+    endif
+  " first trace text then params with added c_str if needed
+    if empty( l:traceText )
+      let l:traceText=l:item . " " . l:type
+    else
+      let l:traceText=l:traceText . " " . l:item . " " . l:type
+    endif
+    if l:type == "%s"
+      let l:item=l:item . ".c_str()"
+    endif
+    if empty(l:params)
+      let l:params=l:item
+    else
+      let l:params=l:params . ", " . l:item
+    endif
+  endfor
+
+  echom "all params " . l:params
+  echom "all text " . l:traceText
+  let l:traceString=GetTraceString()
+  let curLine = getpos(".")[1:1]
+  let curLine = curLine[0]
+  let line=getline(curLine+1)
+  if !empty(matchstr(line,"^\\s\\{-}{"))
+    call cursor(curLine+1,0)
+  endif
+  execute 'normal o'
+  if empty(l:params) || l:params==""
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s __PRETTY_FUNCTION__ \n");'
+  elseif l:traceType == "str"
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s -> ' . l:traceText . '\n", __PRETTY_FUNCTION__,' . l:params. ');'
+  elseif l:traceType == "none"
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s -> ' . l:traceText . ' \n", __PRETTY_FUNCTION__' . ');'
+  else
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s -> ' . l:traceText . ' \n", __PRETTY_FUNCTION__, ' . l:params . ');'
+  endif
+  " execute 'normal a' . g:traceText . "(\"xx - " . output . " -> \\n\");"
+   execute 'normal l'
+
+endfunction
+
 function! Tab_Or_Complete()
     if col('.')>1 && strpart( getline('.'), col('.')-2, 3 ) =~ '^\w'
         return "\<C-N>"
@@ -1186,11 +1257,6 @@ function! LoadSession(filename)
     let g:session_name = ""
   endif
 endfunction
-
-augroup exitGr
-  au VimLeave * :call UpdateSession()
-augroup END
-
 
 
 function! SessionsCompletion(ArgLead, CmdLine, CursorPos)

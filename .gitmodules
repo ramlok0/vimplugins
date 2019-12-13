@@ -178,3 +178,30 @@
 [submodule "vim-clap"]
 	path = vim-clap
 	url = https://github.com/liuchengxu/vim-clap.git
+[submodule "vim-zoom"]
+	path = vim-zoom
+	url = https://github.com/dhruvasagar/vim-zoom.git
+[submodule "git-messenger.vim"]
+	path = git-messenger.vim
+	url = https://github.com/rhysd/git-messenger.vim.git
+[submodule "vim-healthcheck"]
+	path = vim-healthcheck
+	url = https://github.com/rhysd/vim-healthcheck.git
+[submodule "vim-buftabline"]
+	path = vim-buftabline
+	url = https://github.com/ap/vim-buftabline.git
+[submodule "vim-buffest"]
+	path = vim-buffest
+	url = https://github.com/rbong/vim-buffest.git
+[submodule "vem-tabline"]
+	path = vem-tabline
+	url = https://github.com/pacha/vem-tabline.git
+[submodule "vim-markbar"]
+	path = vim-markbar
+	url = https://github.com/Yilin-Yang/vim-markbar.git
+[submodule "vim-visual-multi"]
+	path = vim-visual-multi
+	url = https://github.com/mg979/vim-visual-multi.git
+[submodule "vim-printf"]
+	path = vim-printf
+	url = https://github.com/mptre/vim-printf.git
