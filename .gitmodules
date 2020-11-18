@@ -1,183 +1,12 @@
-[submodule "ctrlp.vim"]
-	path = ctrlp.vim
-	url = https://github.com/ctrlpvim/ctrlp.vim
-[submodule "fzf"]
-	path = fzf
-	url = https://github.com/junegunn/fzf.git
 [submodule "molokai"]
 	path = molokai
 	url = https://github.com/tomasr/molokai.git
-[submodule "quickr-cscope.vim"]
-	path = quickr-cscope.vim
-	url = https://github.com/ronakg/quickr-cscope.vim.git
-[submodule "tagbar"]
-	path = tagbar
-	url = https://github.com/majutsushi/tagbar.git
-[submodule "vim-airline"]
-	path = vim-airline
-	url = https://github.com/vim-airline/vim-airline.git
-[submodule "vim-better-whitespace"]
-	path = vim-better-whitespace
-	url = https://github.com/ntpeters/vim-better-whitespace.git
-[submodule "vim-fswitch"]
-	path = vim-fswitch
-	url = https://github.com/derekwyatt/vim-fswitch.git
-[submodule "vim-gitgutter"]
-	path = vim-gitgutter
-	url = https://github.com/airblade/vim-gitgutter.git
-[submodule "vim-sleuth"]
-	path = vim-sleuth
-	url = https://github.com/tpope/vim-sleuth
-[submodule "YouCompleteMe"]
-	path = YouCompleteMe
-	url = https://github.com/Valloric/YouCompleteMe.git
-	ignore = untracked
-[submodule "vim-fugitive"]
-	path = vim-fugitive
-	url = https://github.com/tpope/vim-fugitive.git
-[submodule "vim-fugitive-blame-ext"]
-	path = vim-fugitive-blame-ext
-	url = https://github.com/tommcdo/vim-fugitive-blame-ext.git
-[submodule "fzf.vim"]
-	path = fzf.vim
-	url = https://github.com/junegunn/fzf.vim.git
-[submodule "vim-multiple-cursors"]
-	path = vim-multiple-cursors
-	url = https://github.com/terryma/vim-multiple-cursors.git
-[submodule "vim-exchange"]
-	path = vim-exchange
-	url = https://github.com/tommcdo/vim-exchange.git
-[submodule "vim-abolish"]
-	path = vim-abolish
-	url = git://github.com/tpope/vim-abolish.git
-[submodule "asyncrun.vim"]
-	path = asyncrun.vim
-	url = https://github.com/skywind3000/asyncrun.vim.git
-[submodule "agrep"]
-	path = agrep
-	url = https://github.com/ramele/agrep.git
-	ignore = untracked
-[submodule "YankRing.vim"]
-	path = YankRing.vim
-	url = https://github.com/vim-scripts/YankRing.vim.git
-	ignore = untracked
-[submodule "vim-snippets"]
-	path = vim-snippets
-	url = https://github.com/honza/vim-snippets.git
 [submodule "YCM-Generator"]
 	path = YCM-Generator
 	url = https://github.com/rdnetto/YCM-Generator.git
-[submodule "targets.vim"]
-	path = targets.vim
-	url = https://github.com/wellle/targets.vim.git
-[submodule "vim-easy-align"]
-	path = vim-easy-align
-	url = https://github.com/junegunn/vim-easy-align.git
-[submodule "clever-f.vim"]
-	path = clever-f.vim
-	url = https://github.com/rhysd/clever-f.vim.git
-[submodule "vim-surround"]
-	path = vim-surround
-	url = https://github.com/tpope/vim-surround.git
-[submodule "vim-matchit"]
-	path = vim-matchit
-	url = https://github.com/adelarsq/vim-matchit.git
-[submodule "fzf-mru.vim"]
-	path = fzf-mru.vim
-	url = https://github.com/pbogut/fzf-mru.vim.git
-[submodule "ctrlsf.vim"]
-	path = ctrlsf.vim
-	url = https://github.com/dyng/ctrlsf.vim.git
-[submodule "far.vim"]
-	path = far.vim
-	url = https://github.com/brooth/far.vim.git
-[submodule "vim-dirdiff"]
-	path = vim-dirdiff
-	url = https://github.com/will133/vim-dirdiff.git
-[submodule "errormarker.vim"]
-	path = errormarker.vim
-	url = https://github.com/mh21/errormarker.vim.git
-[submodule "ferret"]
-	path = ferret
-	url = https://github.com/wincent/ferret.git
-[submodule "vim-codequery"]
-	path = vim-codequery
-	url = https://github.com/devjoe/vim-codequery.git
-[submodule "vim-lsp"]
-	path = vim-lsp
-	url = https://github.com/prabirshrestha/vim-lsp.git
-[submodule "vim-lsp-cquery"]
-	path = vim-lsp-cquery
-	url = https://github.com/pdavydov108/vim-lsp-cquery.git
-[submodule "async.vim"]
-	path = async.vim
-	url = https://github.com/prabirshrestha/async.vim.git
-[submodule "vim-over"]
-	path = vim-over
-	url = https://github.com/osyo-manga/vim-over.git
-[submodule "auto-pairs"]
-	path = auto-pairs
-	url = https://github.com/jiangmiao/auto-pairs.git
-[submodule "vim-ripgrep"]
-	path = vim-ripgrep
-	url = https://github.com/jremmen/vim-ripgrep.git
-[submodule "agit.vim"]
-	path = agit.vim
-	url = https://github.com/cohama/agit.vim.git
-[submodule "nerdtree"]
-	path = nerdtree
-	url = https://github.com/scrooloose/nerdtree.git
-[submodule "vim-mundo"]
-	path = vim-mundo
-	url = https://github.com/simnalamburt/vim-mundo.git
 [submodule "vim-cpp-enhanced-highlight"]
 	path = vim-cpp-enhanced-highlight
 	url = https://github.com/octol/vim-cpp-enhanced-highlight.git
-[submodule "vim-minimap"]
-	path = vim-minimap
-	url = https://github.com/severin-lemaignan/vim-minimap.git
-[submodule "vim-colortuner"]
-	path = vim-colortuner
-	url = https://github.com/zefei/vim-colortuner.git
-[submodule "vim-notes"]
-	path = vim-notes
-	url = https://github.com/xolox/vim-notes.git
-[submodule "vim-misc"]
-	path = vim-misc
-	url = https://github.com/xolox/vim-misc.git
-[submodule "traces.vim"]
-	path = traces.vim
-	url = https://github.com/markonm/traces.vim.git
-[submodule "vim-sneak"]
-	path = vim-sneak
-	url = https://github.com/justinmk/vim-sneak.git
-[submodule "LanguageClient-neovim"]
-	path = LanguageClient-neovim
-	url = https://github.com/autozimu/LanguageClient-neovim.git
-[submodule "quickmenu.vim"]
-	path = quickmenu.vim
-	url = https://github.com/skywind3000/quickmenu.vim.git
-[submodule "vim-airline-themes"]
-	path = vim-airline-themes
-	url = https://github.com/vim-airline/vim-airline-themes.git
-[submodule "nuake"]
-	path = nuake
-	url = https://github.com/Lenovsky/nuake.git
-[submodule "vim-schlepp"]
-	path = vim-schlepp
-	url = https://github.com/zirrostig/vim-schlepp.git
-[submodule "vis"]
-	path = vis
-	url = https://github.com/vim-scripts/vis.git
-[submodule "vim-peekaboo"]
-	path = vim-peekaboo
-	url = https://github.com/junegunn/vim-peekaboo.git
-[submodule "tcomment_vim"]
-	path = tcomment_vim
-	url = https://github.com/tomtom/tcomment_vim.git
-[submodule "vim-clap"]
-	path = vim-clap
-	url = https://github.com/liuchengxu/vim-clap.git
 [submodule "vim-zoom"]
 	path = vim-zoom
 	url = https://github.com/dhruvasagar/vim-zoom.git
@@ -199,9 +28,6 @@
 [submodule "vim-markbar"]
 	path = vim-markbar
 	url = https://github.com/Yilin-Yang/vim-markbar.git
-[submodule "vim-visual-multi"]
-	path = vim-visual-multi
-	url = https://github.com/mg979/vim-visual-multi.git
-[submodule "vim-printf"]
-	path = vim-printf
-	url = https://github.com/mptre/vim-printf.git
+[submodule "vista.vim"]
+	path = vista.vim
+	url = https://github.com/liuchengxu/vista.vim.git

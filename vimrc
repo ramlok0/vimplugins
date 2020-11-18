@@ -2,6 +2,8 @@ if has("win64") || has("win32")
   source $VIMRUNTIME/vimrc_example.vim
 endif
 
+set nocompatible
+
 filetype plugin on
 
 set modelines=0
@@ -10,14 +12,28 @@ set nomodeline
 set clipboard=unnamedplus
 " execute pathogen#infect()
 call plug#begin('~/.vim/bundle')
+Plug 'andymass/vim-matchup'
 " Plug 'liuchengxu/vim-clap'
 " Plug 'ap/vim-buftabline'
 " Plug 'pacha/vem-tabline'
 " edit macros
+Plug 'hiroakis/vim-breakline'
+Plug 'haya14busa/incsearch.vim'
+Plug 'haya14busa/incsearch-easymotion.vim'
+Plug 'easymotion/vim-easymotion'
 Plug 'rbong/vim-buffest'
 Plug 'rhysd/vim-healthcheck'
 Plug 'mg979/vim-visual-multi'
 Plug 'mptre/vim-printf'
+Plug 'ronakg/quickr-preview.vim'
+" Plug 'wellle/context.vim'
+Plug 'junkblocker/git-time-lapse'
+" tagbar more up-to-date but seem slower
+" Plug 'liuchengxu/vista.vim.git'
+" Plug 'liuchengxu/vim-clap.git'
+" Plug 'liuchengxu/vim-clap', { 'do': function('clap#helper#build_all') }
+Plug 'liuchengxu/vim-clap', { 'do': ':Clap install-binary!' }
+Plug 'bignimbus/you-are-here.vim'
 "comming info under cursor
 " Plug 'rhysd/git-messenger.vim'
 " Plug 'dhruvasagar/vim-zoom'
@@ -54,7 +70,9 @@ Plug 'ntpeters/vim-better-whitespace'
 Plug 'derekwyatt/vim-fswitch'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-sleuth'
+"git pull --recurse-submodules
 Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-completer --system-libclang' }
+Plug 'm-pilia/vim-ccls'
 " Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-completer' }
 " Plug 'tpope/vim-fugitive', { 'on': 'Gdiff' }
 " Plug 'tommcdo/vim-fugitive-blame-ext', { 'on': 'Gdiff' }
@@ -79,8 +97,8 @@ Plug 'will133/vim-dirdiff', { 'on': 'DirDiff' }
 Plug 'mh21/errormarker.vim'
 Plug 'wincent/ferret'
 " Plug 'devjoe/vim-codequery', { 'for': 'cpp' }
-Plug 'prabirshrestha/vim-lsp', { 'for': 'cpp' }
-Plug 'pdavydov108/vim-lsp-cquery', { 'for': 'cpp' }
+" Plug 'prabirshrestha/vim-lsp', { 'for': 'cpp' }
+" Plug 'pdavydov108/vim-lsp-cquery', { 'for': 'cpp' }
 " Plug 'pdavydov108/vim-lsp-cquery'
 Plug 'prabirshrestha/async.vim'
 Plug 'osyo-manga/vim-over'
@@ -99,6 +117,7 @@ Plug 'vim-scripts/vis'
 call plug#end()
 
 let g:quickr_cscope_autoload_db = 0
+let g:quickr_cscope_keymaps = 0
 "allows Highlight plugin to save conf
 "set viminfo^=!
 " % - restores buffers between sessions
@@ -108,6 +127,22 @@ if !has('nvim')
 elseif has('nvim')
   set viminfo=!,<800,'10,/50,:100,h,f0,n~/.config/nvim/cache/.viminfo
 endif
+
+
+"""
+"you are here setup
+nnoremap <silent> <leader>here :call you_are_here#YouAreHere()<CR>
+
+" top, right, bottom, left border in popups
+let g:youarehere_border = [1, 1, 1, 1]
+"
+" " top, right, bottom, left padding in popups
+let g:youarehere_padding = [1, 1, 1, 1]
+"
+"" g:content is passed to expand to render the filename.
+"" see :help expand for more options
+let g:content = "%"
+"""
 
 
 "data for plugin quickMenu
@@ -178,6 +213,14 @@ let g:LanguageClient_serverCommands = {
     \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
     \ }
 
+ " let g:LanguageClient_serverCommands = {
+            " \ 'c':   ['cquery', '--log-file=/tmp/vim-cquery.log',
+            " \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
+            " \ 'cpp': ['cquery', '--log-file=/tmp/vim-cquery.log',
+            " \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
+            " \ }
+" 
+" 
 let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
 " let g:LanguageClient_settingsPath = '/home/YOUR_USERNAME/.config/nvim/settings.json'
 " https://github.com/autozimu/LanguageClient-neovim/issues/379 LSP snippet is not supported
@@ -377,15 +420,15 @@ function! LoadTags()
   " exec LanguageClientStart"
 endfunction
 
-if executable('cquery')
-   au User lsp_setup call lsp#register_server({
-      \ 'name': 'cquery',
-      \ 'cmd': {server_info->['cquery']},
-      \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-      \ 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' },
-      \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-      \ })
-endif
+" if executable('cquery')
+   " au User lsp_setup call lsp#register_server({
+      " \ 'name': 'cquery',
+      " \ 'cmd': {server_info->['cquery']},
+      " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      " \ 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' },
+      " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+      " \ })
+" endif
 " if executable('ccls')
    " au User lsp_setup call lsp#register_server({
       " \ 'name': 'ccls',
@@ -502,6 +545,8 @@ set wildignore+=*.so,*.swp,*.zip,*/node_modules/*,*.keep,*.DS_Store
 set guioptions-=T  "remove toolbar
 set guioptions-=r  "remove right-hand scroll bar
 set guioptions-=L  "remove left-hand scroll bar
+set guioptions+=d  "dark menu
+set guioptions-=m  "remove menu
 "set guioptions-=m  "remove menu bar
 set go+=a           " visual selection autocopied to clipboard
 set clipboard=unnamedplus
@@ -556,15 +601,17 @@ nmap <F2> :call BuildBind("")<CR>
 nmap <F3> :VOBROOT=~/main2/ ~/main2/vobs/Opera_DevTools/scripts/build_and_test_WE3_4_x86.sh
 nmap <F4> :AirlineToggleWhitespace<CR>
 nmap <F5> :FSSplitLeft<CR>
-nmap <F6> :NERDTreeToggle<CR>
+" nmap <F6> :NERDTreeToggle<CR>
+nmap <F6> :Clap yanks<CR>
 nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F8> :TagbarToggle<CR>
-nmap <F9> :MundoToggle<CR>
+" nmap <F9> :MundoToggle<CR>
+nmap <F9> :call LanguageClient#textDocument_hover()<CR>
 nmap <F10> :YRShow<CR>
+nnoremap <silent> ,yy :YRShow<CR>
 " noremap <silent><F11> :call quickmenu#toggle(0)<cr>
 noremap <silent><F11> :call ShowExecMenu()<cr>
 nnoremap <silent>,mm :call ShowExecMenu()<cr>
-nnoremap <silent> ,yy :YRShow<CR>
 nnoremap <F12> :Nuake<CR>
 inoremap <F12> <C-\><C-n>:Nuake<CR>
 tnoremap <F12> <C-\><C-n>:Nuake<CR>
@@ -1268,7 +1315,37 @@ let g:VM_maps["Select h"]           = '<S-Left>'
 
 set formatoptions+=j " Delete comment character when joining commented lines
 
-
+" \cg definition
+" \cs symbol
+" \cd definition
+"
+" if a:option == '0'
+    " let query = input('Assignments to: ')
+  " elseif a:option == '1'
+    " let query = input('Functions calling: ')
+  " elseif a:option == '2'
+    " let query = input('Functions called by: ')
+  " elseif a:option == '3'
+    " let query = input('Egrep: ')
+  " elseif a:option == '4'
+    " let query = input('File: ')
+  " elseif a:option == '6'
+    " let query = input('Definition: ')
+  " elseif a:option == '7'
+    " let query = input('Files #including: ')
+  " elseif a:option == '8'
+    " let query = input('C Symbol: ')
+  " elseif a:option == '9'
+  "
+  "
+" 0 or s: Find this C symbol
+" 1 or g: Find this definition
+" 2 or d: Find functions called by this function
+" 3 or c: Find functions calling this function
+" 4 or t: Find this text string
+" 6 or e: Find this egrep pattern
+" 7 or f: Find this file
+" 8 or i: Find files #including this file
 " cscope
 function! Cscope(option, query)
   let color = '{ x = $1; $1 = ""; z = $3; $3 = ""; printf "\033[34m%s\033[0m:\033[31m%s\033[0m\011\033[37m%s\033[0m\n", x,z,$0; }'
@@ -1298,8 +1375,9 @@ nnoremap <silent> ,gg :call Cscope('3', expand('<cword>'))<CR>
 
 
 
-augroup! exitGr
-  au VimLeave * :call UpdateSession(); sleep 3
+augroup exitGr
+  au!
+  au VimLeave * :call UpdateSession()
 augroup END
 
 
@@ -1307,3 +1385,25 @@ command! -range=% TR let b:wv = winsaveview() |
             \ keeppattern <line1>,<line2>s/\s\+$// |
             \ call winrestview(b:wv)
 
+
+" vim clap setup - has cool yank history
+hi default link ClapInput   Visual
+hi default link ClapDisplay Pmenu
+hi default link ClapPreview PmenuSel
+hi default link ClapMatches Search
+
+" By default ClapQuery will use the bold fg of Normal and the same bg of ClapInput
+
+hi ClapDefaultPreview          ctermbg=237 guibg=#3E4452
+hi ClapDefaultSelected         cterm=bold,underline gui=bold,underline ctermfg=80 guifg=#5fd7d7
+hi ClapDefaultCurrentSelection cterm=bold gui=bold ctermfg=224 guifg=#ffd7d7
+
+hi default link ClapPreview          ClapDefaultPreview
+hi default link ClapSelected         ClapDefaultSelected
+hi default link ClapCurrentSelection ClapDefaultCurrentSelection"
+
+
+let g:clap_popup_input_delay=0
+let g:clap_no_matches_msg="NO MATCHES FOUND"
+let g:clap_current_selection_sign={ 'text': '>>', 'texthl': "WarningMsg", "linehl": "ClapCurrentSelection"}
+let g:clap_selected_sign={ 'text': ' >', 'texthl': "WarningMsg", "linehl": "ClapSelected"}

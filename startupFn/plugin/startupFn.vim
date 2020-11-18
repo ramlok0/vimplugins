@@ -267,6 +267,7 @@ endfunction
 
 " call TraceHide("physical\\|CallView\\|HealthService\\|Service\\|DnsMgr\\|CodecManager\\|Beatnik")
 let g:traceString=""
+let g:traceStringPlus=""
 function! GetTraceString()
   if !empty(g:traceString)
     return g:traceString
@@ -352,13 +353,13 @@ function! InsertMethodTrace(expr)
   "execute 'normal a' . "\<Tab>" . g:traceText . "(\"xx - " . xxx . " -> \\n\");"
   " execute 'silent s/\v^(\s*)/\1' . g:traceText . '(\"xx - ' . output . ' -> \\n\");'
   if empty(l:param) || l:param==""
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> \n");'
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . g:traceStringPlus . output . ' -> \n");'
   elseif l:traceType == "str"
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> ' . l:param . ' %s \n",' . l:param . '.c_str()' . ');'
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . g:traceStringPlus . output . ' -> ' . l:param . ' %s \n",' . l:param . '.c_str()' . ');'
   elseif l:traceType == "none"
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> ' . l:param . ' \n"' . ');'
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . g:traceStringPlus . output . ' -> ' . l:param . ' \n"' . ');'
   else
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . output . ' -> ' . l:param . ' %i \n",' . l:param . ');'
+    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - ' . g:traceStringPlus . output . ' -> ' . l:param . ' %i \n",' . l:param . ');'
   endif
   " execute 'normal a' . g:traceText . "(\"xx - " . output . " -> \\n\");"
    execute 'normal l'
@@ -424,13 +425,13 @@ function! InsertMethodTracev(expr)
   endif
   execute 'normal o'
   if empty(l:params) || l:params==""
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s __PRETTY_FUNCTION__ \n");'
+    execute 'normal a' . "\<Tab>" . l:traceString . '( "xx - ' . g:traceStringPlus . ' %s __PRETTY_FUNCTION__ \n");'
   elseif l:traceType == "str"
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s -> ' . l:traceText . '\n", __PRETTY_FUNCTION__,' . l:params. ');'
+    execute 'normal a' . "\<Tab>" . l:traceString . '( "xx - ' . g:traceStringPlus . '%s -> ' . l:traceText . '\n", __PRETTY_FUNCTION__,' . l:params. ');'
   elseif l:traceType == "none"
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s -> ' . l:traceText . ' \n", __PRETTY_FUNCTION__' . ');'
+    execute 'normal a' . "\<Tab>" . l:traceString . '( "xx - ' . g:traceStringPlus . '%s -> ' . l:traceText . ' \n", __PRETTY_FUNCTION__' . ');'
   else
-    execute 'normal a' . "\<Tab>" . l:traceString . '("xx - %s -> ' . l:traceText . ' \n", __PRETTY_FUNCTION__, ' . l:params . ');'
+    execute 'normal a' . "\<Tab>" . l:traceString . '( "xx - ' . g:traceStringPlus . '%s -> ' . l:traceText . ' \n", __PRETTY_FUNCTION__, ' . l:params . ');'
   endif
   " execute 'normal a' . g:traceText . "(\"xx - " . output . " -> \\n\");"
    execute 'normal l'
@@ -1772,7 +1773,7 @@ function! MarkTraceAll(expr) range
     echom "start second while"
     let l:previousMatch=0
     let l:bcount=0
-    while 1
+    while 0
       let l:bcount=l:bcount+1
 
       let l:endBracket=search("^}\\|return",'Wz')
@@ -1792,7 +1793,7 @@ function! MarkTraceAll(expr) range
         " echom "got bracket " . bracket
         " call setpos('.', (l:endBracket-1))
         execute 'normal O'
-        execute 'normal a' . "\<Tab>" . traceString . '("xx - ' . output . ' -> END ' . l:bcount . '\n");'
+        execute 'normal a' . "\<Tab>" . traceString . '("xx - ' . g:traceStringPlus . output . ' -> END ' . l:bcount . '\n");'
         execute 'normal l'
         if matchstr(l:methodEnd,"^}") != ""
           echom "end of method"
