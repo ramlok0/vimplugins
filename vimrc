@@ -33,6 +33,7 @@ Plug 'junkblocker/git-time-lapse'
 " Plug 'liuchengxu/vim-clap.git'
 " Plug 'liuchengxu/vim-clap', { 'do': function('clap#helper#build_all') }
 Plug 'liuchengxu/vim-clap', { 'do': ':Clap install-binary!' }
+" Plug 'mg979/vim-yanktools'
 Plug 'bignimbus/you-are-here.vim'
 "comming info under cursor
 " Plug 'rhysd/git-messenger.vim'
@@ -40,6 +41,7 @@ Plug 'bignimbus/you-are-here.vim'
 " Plug 'neoclide/coc.nvim', {'do': { -> coc#util#install()}}
 " Plug 'junegunn/vim-peekaboo'
 " Plug 'Yilin-Yang/vim-markbar'
+Plug 'ojroques/vim-oscyank'
 Plug 'tomtom/tcomment_vim'
 Plug 'vim-scripts/YankRing.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
@@ -128,6 +130,9 @@ elseif has('nvim')
   set viminfo=!,<800,'10,/50,:100,h,f0,n~/.config/nvim/cache/.viminfo
 endif
 
+
+" autocmd TextYankPost * if v:event.operator is 'y' && v:event.regname is '' | OSCYankReg " | endif
+vnoremap <silent> <leader>y :OSCYank<CR>
 
 """
 "you are here setup
@@ -616,6 +621,8 @@ nnoremap <F12> :Nuake<CR>
 inoremap <F12> <C-\><C-n>:Nuake<CR>
 tnoremap <F12> <C-\><C-n>:Nuake<CR>
 nnoremap <silent> ,tt :Nuake<CR>
+nnoremap <silent> ,y :Clap yanks<CR>
+nnoremap <silent> ,,y :YRShow<CR>
 " nmap ,rr  :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 10<CR>
 " nmap ,ll  :let g:phones="121 122 123" \| let g:branch="mainline"
 "nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
@@ -721,9 +728,23 @@ let g:asyncrun_auto = "make"
 let g:tagbar_ctags_bin='ctags'
 let g:airline#extensions#tagbar#enabled = 1
 let g:asyncrun_status = ''
+let g:anyUnsavedBuffer = ''
 let g:airline_section_error = airline#section#create_right(['%{g:asyncrun_status}'])
+let g:airline_section_error = airline#section#create_right(['%{g:anyUnsavedBuffer}'])
 let g:airline_theme='hybrid'
 tnoremap <expr> <A-r> '<C-\><C-N>"'.nr2char(getchar()).'pi'
+
+function BuffModified()
+    let g:anyUnsavedBuffer = join(filter(range(1,bufnr('$')),'getbufvar(v:val,"&modified")'),"_")
+endfunction
+
+augroup ModBuffer
+  autocmd!
+  autocmd BufLeave,BufWritePost,TextChanged,TextChangedI * execute 'call BuffModified()'
+augroup END
+"echom getbufvar(1,"")
+"https://vim.help/41-write-a-vim-script
+
 " paste in insert mode
 " C-r register
 " delete in insert mode C-u line C-w word, C-h character
@@ -954,7 +975,8 @@ augroup END
 let $FZF_DEFAULT_COMMAND = 'rg --files --follow -g "!{.git,node_modules}/*" 2>/dev/null'
 
 
-
+" let g:fzf_preview_window="right:30%"
+let g:fzf_preview_window=[]
 " let g:ycm_register_as_syntastic_checker = 1 "default 1
 " let g:Show_diagnostics_ui = 1 "default 1
 " 
@@ -1274,18 +1296,6 @@ endfunction
 "
 "
 "
-" Enable true color support
-if &t_Co >= 256 || has("gui_running")
-  "let g:dracula_italic=0
-  let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
-  let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
-
-  if (has("termguicolors"))
-    set termguicolors
-  endif
-endif
-
-
 " do not overwrite git modify signs with error signs - youcompleteme
 let g:ycm_enable_diagnostic_signs = 0
 let g:ycm_enable_diagnostic_highlighting = 1
@@ -1407,3 +1417,25 @@ let g:clap_popup_input_delay=0
 let g:clap_no_matches_msg="NO MATCHES FOUND"
 let g:clap_current_selection_sign={ 'text': '>>', 'texthl': "WarningMsg", "linehl": "ClapCurrentSelection"}
 let g:clap_selected_sign={ 'text': ' >', 'texthl': "WarningMsg", "linehl": "ClapSelected"}
+
+
+
+"KITTY colors
+set termguicolors
+let &t_8f = "\e[38;2;%lu;%lu;%lum"
+let &t_8b = "\e[48;2;%lu;%lu;%lum"
+let &t_ut=''
+" set t_Co=256
+"
+"
+" Enable true color support
+" if &t_Co >= 256 || has("gui_running")
+  " "let g:dracula_italic=0
+  " " let &t_8f="\<Esc>[38;2;%lu;%lu;%lum"
+  " " let &t_8b="\<Esc>[48;2;%lu;%lu;%lum"
+" 
+  " if (has("termguicolors"))
+    " echom "SET TERMCOL"
+    " set termguicolors
+  " endif
+" endif
