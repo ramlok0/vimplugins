@@ -18,6 +18,7 @@ Plug 'andymass/vim-matchup'
 " Plug 'pacha/vem-tabline'
 " edit macros
 Plug 'hiroakis/vim-breakline'
+Plug 'vimwiki/vimwiki'
 Plug 'haya14busa/incsearch.vim'
 Plug 'haya14busa/incsearch-easymotion.vim'
 Plug 'easymotion/vim-easymotion'
@@ -47,6 +48,7 @@ Plug 'vim-scripts/YankRing.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'pbogut/fzf-mru.vim'
+" Plug 'jupyter-vim/jupyter-vim'
 Plug '~/.vim/bundle/molokai'
 " Plug 'zefei/vim-colortuner', { 'on': 'Colortuner' }
 " Plug 'xolox/vim-notes'
@@ -68,12 +70,14 @@ Plug 'majutsushi/tagbar'
 Plug 'vim-airline/vim-airline'
 Plug '~/.vim/bundle/highlight'
 Plug 'ntpeters/vim-better-whitespace'
+" Plug 'metakirby5/codi.vim'
 "show header file for cpp
 Plug 'derekwyatt/vim-fswitch'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-sleuth'
 "git pull --recurse-submodules
-Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-completer --system-libclang' }
+Plug 'Valloric/YouCompleteMe', { 'for': ['cpp','py','javascript'], 'do': './install.py --clang-completer --system-libclang --ts-completer' }
+" Plug 'dense-analysis/ale'
 Plug 'm-pilia/vim-ccls'
 " Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-completer' }
 " Plug 'tpope/vim-fugitive', { 'on': 'Gdiff' }
@@ -118,8 +122,20 @@ Plug 'vim-scripts/vis'
 "https://github.com/t9md/vim-textmanip maybe better moving of blocks with insert/replace
 call plug#end()
 
+""" JUPYTER """
+" autocmd FileType julia,python call jupyter#MakeStandardCommands()
+set pyxversion=3
+
+let g:csPath=""
+let g:ycm_auto_hover=''
+
+" let g:ale_statusline_format = ['☀️️ %d', '🕯️ %d', '']
+" let b:ale_fixers = {'javascript': ['prettier', 'eslint']}
+
 let g:quickr_cscope_autoload_db = 0
 let g:quickr_cscope_keymaps = 0
+autocmd FileType javascript nmap <buffer> <C-]> :YcmCompleter GoTo<CR>
+
 "allows Highlight plugin to save conf
 "set viminfo^=!
 " % - restores buffers between sessions
@@ -173,6 +189,10 @@ let g:execMenu = {
   \ "LangServer Definition":     "call LanguageClient#textDocument_definition()",
   \ "TraceHide":                 "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
   \ "LangServer Caller":         "call LanguageClient#findLocations({\'method\':\'$ccls/call\'})",
+  \ "Cscope callers":            "call CScopeExec(\"c\")",
+  \ "Cscope ref1":               "call CScopeExec(\"e\")",
+  \ "Cscope ref2":               "call CScopeExec(\"t\")",
+  \ "Cscope decl":               "call CScopeExec(\"s\")",
   \}
 
 function ShowExecMenu()
@@ -183,6 +203,17 @@ function ExecMenuSelection(expr)
   execute g:execMenu[a:expr]
 endfunction
 
+function! CScopeExec(method)
+  echom "PATH>" . g:csPath . "<>" . " " . empty(g:csPath) . "<"
+  if empty(g:csPath)
+    echom "cscope not configured with path"
+    return
+  endif
+  echom "got input " . a:method
+  let l:searchTerm = expand("<cword>")
+  echom "got searchterm " . l:searchTerm
+  execute "cscope find " . a:method . " " . l:searchTerm
+endfunction
 "missing
 "call LanguageClient#findLocations({'method':'$ccls/call-hierarchy'})<cr>
 "language server options
@@ -210,13 +241,18 @@ let g:LanguageClient_diagnosticsEnable=0
 let g:LanguageClient_selectionUI="quickfix"
 " let g:clighter8_libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
 
+    " \ 'cpp': ['ccls', '--log-file=/tmp/cc.log --init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
     " \ 'cpp': ['ccls', --log-file=/tmp/cc.log --init={'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }}}'],
+    " \ 'cpp': ['ccls', '-init={"initializationOptions": {"cache": {"directory": "/home/pc/tools/cclsCache/"},"cacheFormat": "json"}}','-log-file=/tmp/ccc.log']
 let g:LanguageClient_serverCommands = {
-    \ 'c': ['ccls', '--log-file=/tmp/cc.log'],
-    \ 'cpp': ['ccls', '--log-file=/tmp/cc.log'],
-    \ 'cuda': ['ccls', '--log-file=/tmp/cc.log'],
-    \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
+      \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/pc/tools/cclsCache/"}}', '--log-file=/tmp/ccls.log' ]
     \ }
+" let g:LanguageClient_serverCommands = {
+    " \ 'c': ['ccls', '--init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
+    " \ 'cpp': ['ccls', '--log-file=/tmp/cc.log --init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
+    " \ 'cuda': ['ccls', '--log-file=/tmp/cc.log'],
+    " \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
+    " \ }
 
  " let g:LanguageClient_serverCommands = {
             " \ 'c':   ['cquery', '--log-file=/tmp/vim-cquery.log',
@@ -425,6 +461,18 @@ function! LoadTags()
   " exec LanguageClientStart"
 endfunction
 
+function! LoadTagsFile(path)
+  let l:path = a:path
+  if (g:currentTagFilePath != l:path )
+    let g:currentTagFilePath = l:path
+    call SetTags(l:path)
+  endif
+  " if (g:lspLoaded == "")
+    " let g:lspLoaded = "true"
+    " call lsp#enable()
+  " endif
+  " exec LanguageClientStart"
+endfunction
 " if executable('cquery')
    " au User lsp_setup call lsp#register_server({
       " \ 'name': 'cquery',
@@ -612,17 +660,22 @@ nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F8> :TagbarToggle<CR>
 " nmap <F9> :MundoToggle<CR>
 nmap <F9> :call LanguageClient#textDocument_hover()<CR>
+nnoremap <silent>,hc :call LanguageClient#textDocument_hover()<CR>
+nmap <silent>,hj <plug>(YCMHover)
 nmap <F10> :YRShow<CR>
 nnoremap <silent> ,yy :YRShow<CR>
 " noremap <silent><F11> :call quickmenu#toggle(0)<cr>
 noremap <silent><F11> :call ShowExecMenu()<cr>
 nnoremap <silent>,mm :call ShowExecMenu()<cr>
+nnoremap <silent>,em :call ShowExecMenu()<cr>
+nnoremap <silent>,me :call ShowExecMenu()<cr>
 nnoremap <F12> :Nuake<CR>
 inoremap <F12> <C-\><C-n>:Nuake<CR>
 tnoremap <F12> <C-\><C-n>:Nuake<CR>
 nnoremap <silent> ,tt :Nuake<CR>
 nnoremap <silent> ,y :Clap yanks<CR>
 nnoremap <silent> ,,y :YRShow<CR>
+nnoremap gp `[v`]
 " nmap ,rr  :AsyncRun buildParse.sh mainline 34 sip 1 %:p:h<CR>:copen 10<CR>
 " nmap ,ll  :let g:phones="121 122 123" \| let g:branch="mainline"
 "nmap <F2> :AsyncRun uploadFw.py mainline 121 122 123<CR>4copen<CR>
@@ -745,6 +798,7 @@ augroup END
 "echom getbufvar(1,"")
 "https://vim.help/41-write-a-vim-script
 
+
 " paste in insert mode
 " C-r register
 " delete in insert mode C-u line C-w word, C-h character
@@ -761,6 +815,7 @@ augroup END
 
 "#########################################
 "configure plugins
+
 
 
 "let g:ctrlp_map = '<c-a>'
@@ -974,6 +1029,7 @@ augroup END
 
 let $FZF_DEFAULT_COMMAND = 'rg --files --follow -g "!{.git,node_modules}/*" 2>/dev/null'
 
+let g:fzf_preview_window="right:30%"
 
 " let g:fzf_preview_window="right:30%"
 let g:fzf_preview_window=[]
@@ -1357,26 +1413,29 @@ set formatoptions+=j " Delete comment character when joining commented lines
 " 7 or f: Find this file
 " 8 or i: Find files #including this file
 " cscope
+let g:csPath=""
 function! Cscope(option, query)
   let color = '{ x = $1; $1 = ""; z = $3; $3 = ""; printf "\033[34m%s\033[0m:\033[31m%s\033[0m\011\033[37m%s\033[0m\n", x,z,$0; }'
-  let l:path = expand('%:p:h')
-  let l:path = substitute(l:path,'vobs.*','','')
-  let l:cspath = l:path . "/vobs/cscope.files"
+  " let l:path = expand('%:p:h')
+  " let l:path = substitute(l:path,'vobs.*','','')
+  " let l:cspath = l:path . "/vobs/cscope.files"
   echom "query " . a:query
+  echom "path " . g:csPath
   echom "option " . a:option
-  echom "path " . l:cspath
+  echom "path " . g:csPath
   let opts = {
-  \ 'source':  "cscope -f" . l:cspath . " " . " -dL" . a:option . " " . a:query . " | awk '" . color . "'",
+  \ 'source':  "cscope -d -f " . g:csPath . " " . " -L " . "-" . a:option . " " . a:query . " | awk '" . color . "'",
   \ 'options': ['--ansi', '--prompt', '> ',
   \             '--multi', '--bind', 'alt-a:select-all,alt-d:deselect-all',
   \             '--color', 'fg:188,fg+:222,bg+:#3a3a3a,hl+:104'],
   \ 'down': '40%'
   \ }
-  function! opts.sink(lines) 
-    let data = split(a:lines)
-    let file = split(data[0], ":")
-    execute 'e ' . '+' . file[1] . ' ' . file[0]
-  endfunction
+  echom "opts " . l:opts
+  " function! opts.sink(lines)
+    " let data = split(a:lines)
+    " let file = split(data[0], ":")
+    " execute 'e ' . '+' . file[1] . ' ' . file[0]
+  " endfunction
   call fzf#run(opts)
 endfunction
 
