@@ -788,7 +788,9 @@ let g:airline_theme='hybrid'
 tnoremap <expr> <A-r> '<C-\><C-N>"'.nr2char(getchar()).'pi'
 
 function BuffModified()
+<<<<<<< HEAD
     let g:anyUnsavedBuffer = join(filter(range(1,bufnr('$')),'getbufvar(v:val,"&modified")'),"_")
+	let g:anyUnsavedBuffer = join(filter(range(1,bufnr('$')),'getbufvar(v:val,"&modified")'),"_")
 endfunction
 
 augroup ModBuffer
@@ -797,6 +799,7 @@ augroup ModBuffer
 augroup END
 "echom getbufvar(1,"")
 "https://vim.help/41-write-a-vim-script
+
 
 
 " paste in insert mode
