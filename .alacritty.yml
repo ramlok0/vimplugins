@@ -517,7 +517,7 @@
 mouse_bindings:
   - { mouse: Middle, mods: Shift, action: PasteSelection }
   - { mouse: Right,  mods: Shift, action: Paste }
-  - { mouse: Middle,  action: PasteSelection  }
+  - { mouse: Middle,  action: None  }
   - { mouse: Right,  action: None }
 
 # Key bindings
