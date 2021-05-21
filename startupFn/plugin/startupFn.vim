@@ -1636,19 +1636,30 @@ function! ClangCheck()
   endif
 endfunction
 
+function! SetTagsCmr()
+  call SetTags("/home/pc/praceData/git/cmr_platform/cmp/dashboard/")
+endfunction
 
+let g:tagPath=""
+let g:csPath=""
 function! SetTags(expr)
   "path to git (mainline) folder
   echom "Set tag path to" . a:expr
-  let g:tagPath=a:expr . "/phones.tag" 
+  let g:tagPath=a:expr . "/phones.tag"
   if filereadable(expand(g:tagPath))
     exe "set tags=" . g:tagPath
   endif
-  let l:csPath = a:expr . "/vobs/cscope.files"
-  echom "readable " . filereadable(expand(l:csPath))
-  if filereadable(expand(l:csPath))
+  let l:testPath1 = a:expr . "/vobs/cscope.files"
+  let l:testPath2 = a:expr . "/cscope.files"
+  if filereadable(expand(l:testPath1))
+    let g:csPath = l:testPath1
+  elseif filereadable(expand(l:testPath2))
+    let g:csPath = l:testPath2
+  endif
+  if ! empty(g:csPath)
+    echo "set cscope"
     exe "cs kill cscope.files"
-    exe "cs add " . a:expr . "/vobs/cscope.files" . " " . " "
+    exe "cs add " . g:csPath . " " . " "
     exe "cs reset"
   endif
   let g:my_db_path=a:expr. "/"
