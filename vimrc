@@ -76,7 +76,7 @@ Plug 'derekwyatt/vim-fswitch'
 Plug 'airblade/vim-gitgutter'
 Plug 'tpope/vim-sleuth'
 "git pull --recurse-submodules
-Plug 'Valloric/YouCompleteMe', { 'for': ['cpp','py','javascript'], 'do': './install.py --clang-completer --system-libclang --ts-completer' }
+Plug 'Valloric/YouCompleteMe', { 'for': ['cpp','python','javascript'], 'do': './install.py --clang-completer --system-libclang --ts-completer' }
 " Plug 'dense-analysis/ale'
 Plug 'm-pilia/vim-ccls'
 " Plug 'Valloric/YouCompleteMe', { 'for': 'cpp', 'do': './install.py --clang-completer' }
@@ -120,6 +120,8 @@ Plug 'zirrostig/vim-schlepp'
 " do in selection B or search S
 Plug 'vim-scripts/vis'
 "https://github.com/t9md/vim-textmanip maybe better moving of blocks with insert/replace
+" Plug 'conweller/findr.vim'
+" Plug 'rbong/vim-flog'
 call plug#end()
 
 """ JUPYTER """
@@ -1499,3 +1501,15 @@ let &t_ut=''
     " set termguicolors
   " endif
 " endif
+"
+"
+"
+let g:ycm_filetype_whitelist = {
+			\ "c":1,
+			\ "cpp":1,
+			\ "objc":1,
+			\ "sh":1,
+			\ "zsh":1,
+			\ "zimbu":1,
+			\ "python":1,
+			\ }
