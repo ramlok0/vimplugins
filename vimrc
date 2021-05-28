@@ -742,11 +742,15 @@ nmap <F6> :Clap yanks<CR>
 nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F8> :TagbarToggle<CR>
 " nmap <F9> :MundoToggle<CR>
-" nmap <F9> :call LanguageClient#textDocument_hover()<CR>
-" nnoremap <silent>,hh :call LanguageClient#textDocument_hover()<CR>
-nmap <F9> :LspHover<CR>
-nnoremap <silent>,hh :LspHover<CR>
-nnoremap <silent>,rr :LspReferences<CR>
+if ( g:lsp_cl == "neocl")
+  nmap <F9> :call LanguageClient#textDocument_hover()<CR>
+  nnoremap <silent>,hh :call LanguageClient#textDocument_hover()<CR>
+  nnoremap <silent>,hh :call LanguageClient#textDocument_references()<CR>
+else
+  nmap <F9> :LspHover<CR>
+  nnoremap <silent>,hh :LspHover<CR>
+  nnoremap <silent>,rr :LspReferences<CR>
+endif
 nnoremap <silent>,bb :call FuzzyBrowse()<CR>
 nmap <silent>,hj <plug>(YCMHover)
 nmap <F10> :YRShow<CR>
@@ -1508,7 +1512,7 @@ set formatoptions+=j " Delete comment character when joining commented lines
 "argument (options) is number
 function! Cscope(option, query)
   let opts = {
-  \ 'source':  "cscope -d -f " . g:csPath . " " . " -L" . a:option . " " . a:query,
+  \ 'source':  "cscope -d -f " . g:csPath . " " . " -L . a:option . " " . a:query,
   \ 'options': ['--ansi', '--prompt', '> ',
   \             '--multi', '--bind', 'alt-a:select-all,alt-d:deselect-all',
   \             '--color', 'fg:188,fg+:222,bg+:#3a3a3a,hl+:104'],
