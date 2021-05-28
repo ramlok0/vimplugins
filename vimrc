@@ -56,10 +56,10 @@ Plug 'xolox/vim-misc'
 Plug 'markonm/traces.vim'
 Plug 'justinmk/vim-sneak'
 " Plug 'autozimu/LanguageClient-neovim', { 'on': 'LanguageClientStart' }
- Plug 'autozimu/LanguageClient-neovim', {
-     \ 'branch': 'next',
-     \ 'do': 'bash install.sh',
-     \ }
+ " Plug 'autozimu/LanguageClient-neovim', {
+     " \ 'branch': 'next',
+     " \ 'do': 'bash install.sh',
+     " \ }
 " Plug 'tomasr/molokai' " now it's ok in plug menu...but it won't update
 " Plug 'simnalamburt/vim-mundo', { 'on': 'MundoToggle' }
 Plug 'ronakg/quickr-cscope.vim'
@@ -114,7 +114,8 @@ Plug 'skywind3000/quickmenu.vim'
 Plug 'cohama/agit.vim', { 'on': 'Agit' }
 Plug '~/.vim/bundle/startupFn'
 Plug 'vim-airline/vim-airline-themes'
-Plug 'Lenovsky/nuake'
+Plug '~/.vim/bundle/nuake'
+" Plug 'Lenovsky/nuake'
 " move selected line up/down
 Plug 'zirrostig/vim-schlepp'
 " do in selection B or search S
@@ -122,7 +123,12 @@ Plug 'vim-scripts/vis'
 "https://github.com/t9md/vim-textmanip maybe better moving of blocks with insert/replace
 " Plug 'conweller/findr.vim'
 " Plug 'rbong/vim-flog'
+Plug 'lambdalisue/gina.vim'
+" Plug 'ggVGc/fzf_browser'
+Plug '~/.vim/bundle/fzf_browser'
 call plug#end()
+
+set rtp+=~/.vim/bundle/fzf_browser
 
 """ JUPYTER """
 " autocmd FileType julia,python call jupyter#MakeStandardCommands()
@@ -182,15 +188,27 @@ let g:content = "%"
 " call g:quickmenu#append('LangSCaller', "call LanguageClient#findLocations({'method':'$ccls/call'})", '')
 " call g:quickmenu#append('TraceHide', 'call TraceHide("SIP\ Signalling\\|Conversation*\\|CallView*")', '')
 
+" let g:execMenu = {
+  " \ "LangServer Menu":           "call LanguageClient_contextMenu()",
+  " \ "LangServer Hover":          "call LanguageClient#textDocument_hover()",
+  " \ "LangServer Implementation": "call LanguageClient#textDocument_implementation()",
+  " \ "LangServer References":     "call LanguageClient#textDocument_references()",
+  " \ "LangServer TypeDef":        "call LanguageClient#textDocument_typeDefinition()",
+  " \ "LangServer Definition":     "call LanguageClient#textDocument_definition()",
+  " \ "TraceHide":                 "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
+  " \ "LangServer Caller":         "call LanguageClient#findLocations({\'method\':\'$ccls/call\'})",
+  " \ "Cscope callers":            "call CScopeExec(\"c\")",
+  " \ "Cscope ref1":               "call CScopeExec(\"e\")",
+  " \ "Cscope ref2":               "call CScopeExec(\"t\")",
+  " \ "Cscope decl":               "call CScopeExec(\"s\")",
+  " \}
+" 
 let g:execMenu = {
-  \ "LangServer Menu":           "call LanguageClient_contextMenu()",
-  \ "LangServer Hover":          "call LanguageClient#textDocument_hover()",
-  \ "LangServer Implementation": "call LanguageClient#textDocument_implementation()",
-  \ "LangServer References":     "call LanguageClient#textDocument_references()",
-  \ "LangServer TypeDef":        "call LanguageClient#textDocument_typeDefinition()",
-  \ "LangServer Definition":     "call LanguageClient#textDocument_definition()",
-  \ "TraceHide":                 "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
-  \ "LangServer Caller":         "call LanguageClient#findLocations({\'method\':\'$ccls/call\'})",
+  \ "Lsp References":     "LspReferences",
+  \ "Lsp PeekDef":        "LspPeekDefinition",
+  \ "Lsp PeekDeclar":     "LspPeekDeclaration",
+  \ "TraceHide":          "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
+  \ "ZLsp Hover":          "LspHover",
   \ "Cscope callers":            "call CScopeExec(\"c\")",
   \ "Cscope ref1":               "call CScopeExec(\"e\")",
   \ "Cscope ref2":               "call CScopeExec(\"t\")",
@@ -246,9 +264,16 @@ let g:LanguageClient_selectionUI="quickfix"
     " \ 'cpp': ['ccls', '--log-file=/tmp/cc.log --init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
     " \ 'cpp': ['ccls', --log-file=/tmp/cc.log --init={'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }}}'],
     " \ 'cpp': ['ccls', '-init={"initializationOptions": {"cache": {"directory": "/home/pc/tools/cclsCache/"},"cacheFormat": "json"}}','-log-file=/tmp/ccc.log']
-let g:LanguageClient_serverCommands = {
-      \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/pc/tools/cclsCache/"}}', '--log-file=/tmp/ccls.log' ]
-    \ }
+    " WORKING CONFIG FOR LANGUAGE CLIENT
+" if $USER == "pc"
+" let g:LanguageClient_serverCommands = {
+      " \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/pc/tools/cclsCache/"}}', '--log-file=/tmp/ccls.log' ]
+    " \ }
+" else
+" let g:LanguageClient_serverCommands = {
+      " \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/km000057/HD0/tools/ccls2/vimcache/"}}', '--log-file=/tmp/ccls.log' ]
+    " \ }
+" endif
 " let g:LanguageClient_serverCommands = {
     " \ 'c': ['ccls', '--init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
     " \ 'cpp': ['ccls', '--log-file=/tmp/cc.log --init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
@@ -484,19 +509,64 @@ endfunction
       " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
       " \ })
 " endif
-" if executable('ccls')
-   " au User lsp_setup call lsp#register_server({
-      " \ 'name': 'ccls',
-      " \ 'cmd': {server_info->['ccls']},
-      " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-      " \ 'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }},
-      " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-      " \ })
-" endif
+
+if $USER == "pc"
+  if executable('ccls')
+     au User lsp_setup call lsp#register_server({
+        \ 'name': 'ccls',
+        \ 'cmd': {server_info->['ccls']},
+        \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+        \ 'initialization_options': { 'cache': {'directory': '/home/pc/tools/cclsCache' }},
+        \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+        \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+        \ })
+  endif
+else
+  if executable('ccls')
+     au User lsp_setup call lsp#register_server({
+        \ 'name': 'ccls',
+        \ 'cmd': {server_info->['ccls']},
+        \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+        \ 'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }},
+        \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+        \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+        \ })
+  endif
+endif
+function! s:on_lsp_buffer_enabled() abort
+    " setlocal omnifunc=lsp#complete
+    " setlocal signcolumn=yes
+    " if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+    " nmap <buffer> gd <plug>(lsp-definition)
+    " nmap <buffer> gs <plug>(lsp-document-symbol-search)
+    " nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+    " nmap <buffer> gr <plug>(lsp-references)
+    " nmap <buffer> gi <plug>(lsp-implementation)
+    " nmap <buffer> gt <plug>(lsp-type-definition)
+    " nmap <buffer> <leader>rn <plug>(lsp-rename)
+    " nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+    " nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+    " nmap <buffer> K <plug>(lsp-hover)
+    " inoremap <buffer> <expr><c-f> lsp#scroll(+4)
+    " inoremap <buffer> <expr><c-d> lsp#scroll(-4)
+    let g:lsp_fold_enabled = 0
+    let g:lsp_document_highlight_enabled = 0
+    let g:lsp_diagnostics_enabled = 0
+    let g:lsp_format_sync_timeout = 200
+    " autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+    
+    " refer to doc to add more commands
+endfunction
+
+let g:lsp_fold_enabled = 0
+let g:lsp_document_highlight_enabled = 0
+let g:lsp_diagnostics_enabled = 0
+let g:lsp_format_sync_timeout = 200
 
 
 "################################################
 " YouCompleteMe setup
+let g:ycm_auto_hover=""
 let g:ycm_min_num_of_chars_for_completion = 2
 let g:ycm_auto_trigger = 1
 let g:ycm_collect_identifiers_from_tags_files = 0
@@ -661,8 +731,11 @@ nmap <F6> :Clap yanks<CR>
 nmap <F7> :call asyncrun#quickfix_toggle(9)<CR>
 nmap <F8> :TagbarToggle<CR>
 " nmap <F9> :MundoToggle<CR>
-nmap <F9> :call LanguageClient#textDocument_hover()<CR>
-nnoremap <silent>,hc :call LanguageClient#textDocument_hover()<CR>
+" nmap <F9> :call LanguageClient#textDocument_hover()<CR>
+" nnoremap <silent>,hh :call LanguageClient#textDocument_hover()<CR>
+nmap <F9> :LspHover<CR>
+nnoremap <silent>,hh :LspHover<CR>
+nnoremap <silent>,rr :LspReferences<CR>
 nmap <silent>,hj <plug>(YCMHover)
 nmap <F10> :YRShow<CR>
 nnoremap <silent> ,yy :YRShow<CR>
@@ -1036,6 +1109,7 @@ let g:fzf_preview_window="right:30%"
 
 " let g:fzf_preview_window="right:30%"
 let g:fzf_preview_window=[]
+let g:fzf_layout = { 'down': '~40%' }
 " let g:ycm_register_as_syntastic_checker = 1 "default 1
 " let g:Show_diagnostics_ui = 1 "default 1
 " 
@@ -1258,7 +1332,10 @@ function! RealBalloonExpr(timer)
   call balloon_show( g:hoverInfo )
 endfunction
 
-" set mouse=a
+" send events to vim from kitty
+set mouse=a
+" better pasting copied text
+set paste
 " set ttymouse=sgr
 " set balloonexpr=MyBalloonExpr()
 " set balloondelay=250
@@ -1480,6 +1557,21 @@ let g:clap_no_matches_msg="NO MATCHES FOUND"
 let g:clap_current_selection_sign={ 'text': '>>', 'texthl': "WarningMsg", "linehl": "ClapCurrentSelection"}
 let g:clap_selected_sign={ 'text': ' >', 'texthl': "WarningMsg", "linehl": "ClapSelected"}
 
+" let g:yankB = []
+" "capture yank and other events
+" function! Tttt()
+  " echom "yank was done " . @"
+  " let l:dd = @"
+  " " let g:yankB.append(l:dd)
+  " call add( g:yankB, @" )
+" endfunction
+" 
+" augroup highlight_yank
+" autocmd!
+" autocmd TextYankPost * call Tttt()
+" augroup END
+ " 
+" :call fzf#run({'source': g:yankB}) 
 
 
 "KITTY colors
@@ -1513,3 +1605,6 @@ let g:ycm_filetype_whitelist = {
 			\ "zimbu":1,
 			\ "python":1,
 			\ }
+
+
+" call FuzzyBrowse("/home/pc/")

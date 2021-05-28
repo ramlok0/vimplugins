@@ -1,0 +1,15 @@
+g:close_if_last_standing	nuake.txt	/*g:close_if_last_standing*
+g:nuake_per_tab	nuake.txt	/*g:nuake_per_tab*
+g:nuake_position	nuake.txt	/*g:nuake_position*
+g:nuake_size	nuake.txt	/*g:nuake_size*
+g:start_insert	nuake.txt	/*g:start_insert*
+nuake-changelog	nuake.txt	/*nuake-changelog*
+nuake-configuration	nuake.txt	/*nuake-configuration*
+nuake-contents	nuake.txt	/*nuake-contents*
+nuake-contributing	nuake.txt	/*nuake-contributing*
+nuake-introduction	nuake.txt	/*nuake-introduction*
+nuake-issues	nuake.txt	/*nuake-issues*
+nuake-license	nuake.txt	/*nuake-license*
+nuake-pulls	nuake.txt	/*nuake-pulls*
+nuake-usage	nuake.txt	/*nuake-usage*
+nuake.txt	nuake.txt	/*nuake.txt*

@@ -515,10 +515,10 @@ env:
 #mouse_bindings:
 #  - { mouse: Middle, action: PasteSelection }
 mouse_bindings:
-  - { mouse: Middle, mods: Shift, action: None }
-  - { mouse: Right,  mods: Shift, action: Paste }
-  - { mouse: Middle,  action: PasteSelection  }
-  - { mouse: Right,  action: None }
+  - {mouse: Middle, mods: Shift, action: None}
+  - {mouse: Right, mods: Shift, action: Paste}
+  - {mouse: Middle, action: PasteSelection}
+  - {mouse: Right, action: None}
 
 # Key bindings
 #
@@ -855,3 +855,56 @@ mouse_bindings:
 
   # Print all received window events.
   #print_events: false
+colors:
+  # COLORSCHEME: ayu_dark.yaml
+  # Default colors
+  primary:
+    # hard contrast: background = '0x1d2021'
+    background: '0x0A0E14'
+    foreground: '0xB3B1AD'
+
+  # Normal colors
+  cursor:
+    text: '0x1d1f21'
+    cursor: '0xffffff'
+
+  # Normal colors
+  normal:
+  # Bright colors
+    black: '0x01060E'
+    red: '0xEA6C73'
+    green: '0x91B362'
+    yellow: '0xF9AF4F'
+    blue: '0x53BDFA'
+    magenta: '0xFAE994'
+    cyan: '0x90E1C6'
+    white: '0xC7C7C7'
+
+  # Bright colors
+  bright:
+    black: '0x686868'
+    red: '0xF07178'
+    green: '0xC2D94C'
+    yellow: '0xFFB454'
+    blue: '0x59C2FF'
+    magenta: '0xFFEE99'
+    cyan: '0x95E6CB'
+    white: '0xFFFFFF'
+  dim:
+    black: '0x000000'
+    red: '0xa90000'
+    green: '0x049f2b'
+    yellow: '0xa3b106'
+    blue: '0x530aba'
+    magenta: '0xbb006b'
+    cyan: '0x433364'
+    white: '0x5f5f5f'
+  search:
+    matches:
+      foreground: '0xb2b2b2'
+      background: '0xb26818'
+    focused_match:
+      foreground: CellBackground
+      background: CellForeground
+
+  indexed_colors: []
