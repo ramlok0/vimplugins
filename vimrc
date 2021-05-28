@@ -103,7 +103,7 @@ Plug 'will133/vim-dirdiff', { 'on': 'DirDiff' }
 Plug 'mh21/errormarker.vim'
 Plug 'wincent/ferret'
 " Plug 'devjoe/vim-codequery', { 'for': 'cpp' }
-" Plug 'prabirshrestha/vim-lsp', { 'for': 'cpp' }
+Plug 'prabirshrestha/vim-lsp'
 " Plug 'pdavydov108/vim-lsp-cquery', { 'for': 'cpp' }
 " Plug 'pdavydov108/vim-lsp-cquery'
 Plug 'prabirshrestha/async.vim'
@@ -208,15 +208,15 @@ let g:execMenu = {
   \ "Lsp PeekDef":        "LspPeekDefinition",
   \ "Lsp PeekDeclar":     "LspPeekDeclaration",
   \ "TraceHide":          "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
-  \ "ZLsp Hover":          "LspHover",
   \ "Cscope callers":            "call CScopeExec(\"c\")",
   \ "Cscope ref1":               "call CScopeExec(\"e\")",
   \ "Cscope ref2":               "call CScopeExec(\"t\")",
   \ "Cscope decl":               "call CScopeExec(\"s\")",
+  \ "Lsp Hover":          "LspHover",
   \}
 
 function ShowExecMenu()
-  call fzf#run({'source':keys(g:execMenu), 'down': '30%', 'sink': function('ExecMenuSelection')})
+  call fzf#run({'source':keys(g:execMenu), 'down': '30%', 'sink': function('ExecMenuSelection'), 'options':['--no-sort']})
 endfunction
 
 function ExecMenuSelection(expr)
@@ -265,7 +265,9 @@ let g:LanguageClient_selectionUI="quickfix"
     " \ 'cpp': ['ccls', --log-file=/tmp/cc.log --init={'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }}}'],
     " \ 'cpp': ['ccls', '-init={"initializationOptions": {"cache": {"directory": "/home/pc/tools/cclsCache/"},"cacheFormat": "json"}}','-log-file=/tmp/ccc.log']
     " WORKING CONFIG FOR LANGUAGE CLIENT
-" if $USER == "pc"
+  let g:user_name = $USER
+
+  " if ( g:user_name == "pc" )
 " let g:LanguageClient_serverCommands = {
       " \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/pc/tools/cclsCache/"}}', '--log-file=/tmp/ccls.log' ]
     " \ }
@@ -510,7 +512,7 @@ endfunction
       " \ })
 " endif
 
-if $USER == "pc"
+if ( g:user_name == "pc" )
   if executable('ccls')
      au User lsp_setup call lsp#register_server({
         \ 'name': 'ccls',
@@ -533,6 +535,19 @@ else
         \ })
   endif
 endif
+
+" else
+  " if executable('ccls')
+     " au User lsp_setup call lsp#register_server({
+        " \ 'name': 'ccls',
+        " \ 'cmd': {server_info->['ccls']},
+        " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+        " \ 'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }},
+        " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+        " \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+        " \ })
+  " endif
+" endif
 function! s:on_lsp_buffer_enabled() abort
     " setlocal omnifunc=lsp#complete
     " setlocal signcolumn=yes
@@ -736,6 +751,7 @@ nmap <F8> :TagbarToggle<CR>
 nmap <F9> :LspHover<CR>
 nnoremap <silent>,hh :LspHover<CR>
 nnoremap <silent>,rr :LspReferences<CR>
+nnoremap <silent>,bb :call FuzzyBrowse()<CR>
 nmap <silent>,hj <plug>(YCMHover)
 nmap <F10> :YRShow<CR>
 nnoremap <silent> ,yy :YRShow<CR>

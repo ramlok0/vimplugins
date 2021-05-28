@@ -1,4 +1,4 @@
-
+let s:fzf_browser_path = expand('<sfile>:p:h:h')
 
 let g:fzf_browser_ignore_dirs=""
 let g:fzf_browser_ignore_files=""
@@ -68,17 +68,18 @@ fun! FuzzyBrowse(...)
   if g:fzf_browser_ignore_dirs != ""
     let l:dirIgnore = " -d ".g:fzf_browser_ignore_dirs." "
   endif
-  let cmd = "/home/pc/.vim/bundle/fzf_browser/fuzzybrowse ".l:dirIgnore.l:fileIgnore.join(l:data, ' ')
+  let cmd = s:fzf_browser_path . "/fuzzybrowse " . l:dirIgnore.l:fileIgnore.join(l:data, ' ')
+  " let cmd = "/home/pc/.vim/bundle/fzf_browser/fuzzybrowse ".l:dirIgnore.l:fileIgnore.join(l:data, ' ')
   let s:firstOpen = 0
-  if has("vim")
+  " if has("vim")
   " let s:termBuf = term_start(l:cmd, {'term_finish': 'close', 'exit_cb': function('s:AfterFuzzyTerminal'), 'callback': function('s:OnTerminalOpen')})
     let s:termBuf = term_start(l:cmd, {'term_finish': 'close', 'exit_cb': function('s:AfterFuzzyTerminal'), 'out_cb': function('s:Onout'), 'callback': function('s:OnTerminalOpen') })
-  else
+  " else
     " {'on_exit': function('s:on_floaterm_close', [bufnr, get(a:jobopts, 'on_exit', v:null)])
     " let ch = termopen(l:cmd, a:jobopts)
  " |on_stdout|:  (function) Callback invoked when the job emits
 			      " stdout data.
-  endif
+  " endif
 endfun
 
 
