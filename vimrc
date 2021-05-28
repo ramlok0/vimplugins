@@ -2,14 +2,17 @@ if has("win64") || has("win32")
   source $VIMRUNTIME/vimrc_example.vim
 endif
 
+let g:user_name = $USER
+" let g:lsp_cl="vimlsp"
+let g:lsp_cl="neocl"
+
+
 set nocompatible
-
 filetype plugin on
-
 set modelines=0
 set nomodeline
-
 set clipboard=unnamedplus
+
 " execute pathogen#infect()
 call plug#begin('~/.vim/bundle')
 Plug 'andymass/vim-matchup'
@@ -55,11 +58,18 @@ Plug '~/.vim/bundle/molokai'
 Plug 'xolox/vim-misc'
 Plug 'markonm/traces.vim'
 Plug 'justinmk/vim-sneak'
+if ( g:lsp_cl == "neocl" )
 " Plug 'autozimu/LanguageClient-neovim', { 'on': 'LanguageClientStart' }
- " Plug 'autozimu/LanguageClient-neovim', {
-     " \ 'branch': 'next',
-     " \ 'do': 'bash install.sh',
-     " \ }
+ Plug 'autozimu/LanguageClient-neovim', {
+     \ 'branch': 'next',
+     \ 'do': 'bash install.sh',
+     \ }
+else
+" Plug 'devjoe/vim-codequery', { 'for': 'cpp' }
+  Plug 'prabirshrestha/vim-lsp'
+" Plug 'pdavydov108/vim-lsp-cquery', { 'for': 'cpp' }
+" Plug 'pdavydov108/vim-lsp-cquery'
+endif
 " Plug 'tomasr/molokai' " now it's ok in plug menu...but it won't update
 " Plug 'simnalamburt/vim-mundo', { 'on': 'MundoToggle' }
 Plug 'ronakg/quickr-cscope.vim'
@@ -102,10 +112,6 @@ Plug 'brooth/far.vim', { 'on': 'Far' }
 Plug 'will133/vim-dirdiff', { 'on': 'DirDiff' }
 Plug 'mh21/errormarker.vim'
 Plug 'wincent/ferret'
-" Plug 'devjoe/vim-codequery', { 'for': 'cpp' }
-Plug 'prabirshrestha/vim-lsp'
-" Plug 'pdavydov108/vim-lsp-cquery', { 'for': 'cpp' }
-" Plug 'pdavydov108/vim-lsp-cquery'
 Plug 'prabirshrestha/async.vim'
 Plug 'osyo-manga/vim-over'
 Plug 'jiangmiao/auto-pairs'
@@ -126,6 +132,7 @@ Plug 'vim-scripts/vis'
 Plug 'lambdalisue/gina.vim'
 " Plug 'ggVGc/fzf_browser'
 Plug '~/.vim/bundle/fzf_browser'
+Plug 'yssl/QFEnter'
 call plug#end()
 
 set rtp+=~/.vim/bundle/fzf_browser
@@ -187,33 +194,138 @@ let g:content = "%"
 " call g:quickmenu#append('LangSDef', 'call LanguageClient#textDocument_definition()', '')
 " call g:quickmenu#append('LangSCaller', "call LanguageClient#findLocations({'method':'$ccls/call'})", '')
 " call g:quickmenu#append('TraceHide', 'call TraceHide("SIP\ Signalling\\|Conversation*\\|CallView*")', '')
+""" LSP CONFIG
+"
+function! EnsureDirExists (dir)
+  if !isdirectory(a:dir)
+    if exists("*mkdir")
+      call mkdir(a:dir,'p')
+      echo "Created directory: " . a:dir
+    else
+      echo "Please create directory: " . a:dir
+    endif
+  endif
+endfunction
+echom "LSP CL " . g:lsp_cl
+if ( g:lsp_cl == "neocl" )
+  echom "IF  CLIENT"
+  let g:execMenu = {
+    \ "LangServer Menu":           "call LanguageClient_contextMenu()",
+    \ "LangServer Hover":          "call LanguageClient#textDocument_hover()",
+    \ "LangServer Implementation": "call LanguageClient#textDocument_implementation()",
+    \ "LangServer References":     "call LanguageClient#textDocument_references()",
+    \ "LangServer TypeDef":        "call LanguageClient#textDocument_typeDefinition()",
+    \ "LangServer Definition":     "call LanguageClient#textDocument_definition()",
+    \ "TraceHide":                 "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
+    \ "LangServer Caller":         "call LanguageClient#findLocations({\'method\':\'$ccls/call\'})",
+    \ "Cscope callers":            "call CScopeExec(\"c\")",
+    \ "Cscope ref1":               "call CScopeExec(\"e\")",
+    \ "Cscope ref2":               "call CScopeExec(\"t\")",
+    \ "Cscope decl":               "call CScopeExec(\"s\")",
+    \}
 
-" let g:execMenu = {
-  " \ "LangServer Menu":           "call LanguageClient_contextMenu()",
-  " \ "LangServer Hover":          "call LanguageClient#textDocument_hover()",
-  " \ "LangServer Implementation": "call LanguageClient#textDocument_implementation()",
-  " \ "LangServer References":     "call LanguageClient#textDocument_references()",
-  " \ "LangServer TypeDef":        "call LanguageClient#textDocument_typeDefinition()",
-  " \ "LangServer Definition":     "call LanguageClient#textDocument_definition()",
-  " \ "TraceHide":                 "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
-  " \ "LangServer Caller":         "call LanguageClient#findLocations({\'method\':\'$ccls/call\'})",
-  " \ "Cscope callers":            "call CScopeExec(\"c\")",
-  " \ "Cscope ref1":               "call CScopeExec(\"e\")",
-  " \ "Cscope ref2":               "call CScopeExec(\"t\")",
-  " \ "Cscope decl":               "call CScopeExec(\"s\")",
-  " \}
-" 
-let g:execMenu = {
-  \ "Lsp References":     "LspReferences",
-  \ "Lsp PeekDef":        "LspPeekDefinition",
-  \ "Lsp PeekDeclar":     "LspPeekDeclaration",
-  \ "TraceHide":          "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
-  \ "Cscope callers":            "call CScopeExec(\"c\")",
-  \ "Cscope ref1":               "call CScopeExec(\"e\")",
-  \ "Cscope ref2":               "call CScopeExec(\"t\")",
-  \ "Cscope decl":               "call CScopeExec(\"s\")",
-  \ "Lsp Hover":          "LspHover",
-  \}
+
+  let g:LanguageClient_diagnosticsEnable=0
+  let g:LanguageClient_selectionUI="quickfix"
+  let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
+  " let g:LanguageClient_settingsPath = '/home/YOUR_USERNAME/.config/nvim/settings.json'
+  " https://github.com/autozimu/LanguageClient-neovim/issues/379 LSP snippet is not supported
+  let g:LanguageClient_hasSnippetSupport = 0
+  let g:LanguageClient_hoverPreview="Always"
+
+  if ( g:user_name == "pc" )
+    call EnsureDirExists("/home/pc/tools/cclsCache/")
+    let g:LanguageClient_serverCommands = {
+      \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/pc/tools/cclsCache/"}}', '--log-file=/tmp/ccls.log' ]
+    \ }
+  else
+    call EnsureDirExists("/home/km000057/HD0/tools/ccls2/vimcache/")
+    let g:LanguageClient_serverCommands = {
+      \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/km000057/HD0/tools/ccls2/vimcache/"}}', '--log-file=/tmp/ccls.log' ]
+    \ }
+  endif
+else
+  echom "ELSE CLIENT"
+  let g:execMenu = {
+    \ "Lsp References":     "LspReferences",
+    \ "Lsp Declaration":    "LspDeclaration",
+    \ "Lsp Definition":     "LspDefinition",
+    \ "Lsp PeekDef":        "LspPeekDefinition",
+    \ "Lsp PeekDeclar":     "LspPeekDeclaration",
+    \ "TraceHide":          "call TraceHide('SIP\ Signalling\\|Conversation*\\|CallView*')",
+    \ "Cscope callers":            "call CScopeExec(\"c\")",
+    \ "Cscope ref1":               "call CScopeExec(\"e\")",
+    \ "Cscope ref2":               "call CScopeExec(\"t\")",
+    \ "Cscope decl":               "call CScopeExec(\"s\")",
+    \ "Lsp Hover":          "LspHover",
+    \}
+  function! s:on_lsp_buffer_enabled() abort
+      " setlocal omnifunc=lsp#complete
+      " setlocal signcolumn=yes
+      " if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
+      " nmap <buffer> gd <plug>(lsp-definition)
+      " nmap <buffer> gs <plug>(lsp-document-symbol-search)
+      " nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
+      " nmap <buffer> gr <plug>(lsp-references)
+      " nmap <buffer> gi <plug>(lsp-implementation)
+      " nmap <buffer> gt <plug>(lsp-type-definition)
+      " nmap <buffer> <leader>rn <plug>(lsp-rename)
+      " nmap <buffer> [g <plug>(lsp-previous-diagnostic)
+      " nmap <buffer> ]g <plug>(lsp-next-diagnostic)
+      " nmap <buffer> K <plug>(lsp-hover)
+      " inoremap <buffer> <expr><c-f> lsp#scroll(+4)
+      " inoremap <buffer> <expr><c-d> lsp#scroll(-4)
+      let g:lsp_fold_enabled = 0
+      let g:lsp_document_highlight_enabled = 0
+      let g:lsp_diagnostics_enabled = 0
+      let g:lsp_format_sync_timeout = 200
+      " autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
+
+      " refer to doc to add more commands
+  endfunction
+
+  let g:lsp_fold_enabled = 0
+  let g:lsp_document_highlight_enabled = 0
+  let g:lsp_diagnostics_enabled = 0
+  let g:lsp_format_sync_timeout = 200
+
+  if ( g:user_name == "pc" )
+    call EnsureDirExists("/home/pc/tools/cclsCache2")
+    if executable('ccls')
+       au User lsp_setup call lsp#register_server({
+          \ 'name': 'ccls',
+          \ 'cmd': {server_info->['ccls']},
+          \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+          \ 'initialization_options': { 'cache': {'directory': '/home/pc/tools/cclsCache2' }},
+          \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+          \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+          \ })
+    endif
+  else
+    call EnsureDirExists("/home/km000057/tools/ccls/Release/cacheVimLsp")
+    if executable('ccls')
+       au User lsp_setup call lsp#register_server({
+          \ 'name': 'ccls',
+          \ 'cmd': {server_info->['ccls']},
+          \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+          \ 'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cacheVimLsp' }},
+          \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+          \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+          \ })
+    endif
+
+  endif
+endif
+
+" if executable('cquery')
+   " au User lsp_setup call lsp#register_server({
+      " \ 'name': 'cquery',
+      " \ 'cmd': {server_info->['cquery']},
+      " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
+      " \ 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' },
+      " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
+      " \ })
+" endif
 
 function ShowExecMenu()
   call fzf#run({'source':keys(g:execMenu), 'down': '30%', 'sink': function('ExecMenuSelection'), 'options':['--no-sort']})
@@ -257,46 +369,6 @@ endfunction
 " nn <silent> xf :call LanguageClient#findLocations({'method':'$ccls/member','kind':3})<cr>
 " " member variables / variables in a namespace
 " nn <silent> xm :call LanguageClient#findLocations({'method':'$ccls/member'})<cr>
-let g:LanguageClient_diagnosticsEnable=0
-let g:LanguageClient_selectionUI="quickfix"
-" let g:clighter8_libclang_path="/usr/lib/llvm-6.0/lib/libclang.so"
-
-    " \ 'cpp': ['ccls', '--log-file=/tmp/cc.log --init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
-    " \ 'cpp': ['ccls', --log-file=/tmp/cc.log --init={'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }}}'],
-    " \ 'cpp': ['ccls', '-init={"initializationOptions": {"cache": {"directory": "/home/pc/tools/cclsCache/"},"cacheFormat": "json"}}','-log-file=/tmp/ccc.log']
-    " WORKING CONFIG FOR LANGUAGE CLIENT
-  let g:user_name = $USER
-
-  " if ( g:user_name == "pc" )
-" let g:LanguageClient_serverCommands = {
-      " \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/pc/tools/cclsCache/"}}', '--log-file=/tmp/ccls.log' ]
-    " \ }
-" else
-" let g:LanguageClient_serverCommands = {
-      " \ 'cpp': ['ccls', '-init={"compilationDatabaseCommand":"","compilationDatabaseDirectory":"","cache":{"directory":"/home/km000057/HD0/tools/ccls2/vimcache/"}}', '--log-file=/tmp/ccls.log' ]
-    " \ }
-" endif
-" let g:LanguageClient_serverCommands = {
-    " \ 'c': ['ccls', '--init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
-    " \ 'cpp': ['ccls', '--log-file=/tmp/cc.log --init={"initialization_options": { "cache": {"directory": "/home/pc/tools/cclsCache" }}}'],
-    " \ 'cuda': ['ccls', '--log-file=/tmp/cc.log'],
-    " \ 'objc': ['ccls', '--log-file=/tmp/cc.log'],
-    " \ }
-
- " let g:LanguageClient_serverCommands = {
-            " \ 'c':   ['cquery', '--log-file=/tmp/vim-cquery.log',
-            " \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
-            " \ 'cpp': ['cquery', '--log-file=/tmp/vim-cquery.log',
-            " \         '--init={"cacheDirectory":"$HOME/.cquery-cache"}'],
-            " \ }
-" 
-" 
-let g:LanguageClient_loadSettings = 1 " Use an absolute configuration path if you want system-wide settings
-" let g:LanguageClient_settingsPath = '/home/YOUR_USERNAME/.config/nvim/settings.json'
-" https://github.com/autozimu/LanguageClient-neovim/issues/379 LSP snippet is not supported
-let g:LanguageClient_hasSnippetSupport = 0
-
-let g:LanguageClient_hoverPreview="Always"
 "allow you to move freely in visual block mode
 set virtualedit=block
 
@@ -502,82 +574,6 @@ function! LoadTagsFile(path)
   " endif
   " exec LanguageClientStart"
 endfunction
-" if executable('cquery')
-   " au User lsp_setup call lsp#register_server({
-      " \ 'name': 'cquery',
-      " \ 'cmd': {server_info->['cquery']},
-      " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-      " \ 'initialization_options': { 'cacheDirectory': '/home/km000057/tools/cquery/build/release/cache' },
-      " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-      " \ })
-" endif
-
-if ( g:user_name == "pc" )
-  if executable('ccls')
-     au User lsp_setup call lsp#register_server({
-        \ 'name': 'ccls',
-        \ 'cmd': {server_info->['ccls']},
-        \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-        \ 'initialization_options': { 'cache': {'directory': '/home/pc/tools/cclsCache' }},
-        \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-        \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-        \ })
-  endif
-else
-  if executable('ccls')
-     au User lsp_setup call lsp#register_server({
-        \ 'name': 'ccls',
-        \ 'cmd': {server_info->['ccls']},
-        \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-        \ 'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }},
-        \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-        \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-        \ })
-  endif
-endif
-
-" else
-  " if executable('ccls')
-     " au User lsp_setup call lsp#register_server({
-        " \ 'name': 'ccls',
-        " \ 'cmd': {server_info->['ccls']},
-        " \ 'root_uri': {server_info->lsp#utils#path_to_uri(lsp#utils#find_nearest_parent_file_directory(lsp#utils#get_buffer_path(), 'compile_commands.json'))},
-        " \ 'initialization_options': { 'cache': {'directory': '/home/km000057/tools/ccls/Release/cache' }},
-        " \ 'whitelist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-        " \ 'allowlist': ['c', 'cpp', 'objc', 'objcpp', 'cc'],
-        " \ })
-  " endif
-" endif
-function! s:on_lsp_buffer_enabled() abort
-    " setlocal omnifunc=lsp#complete
-    " setlocal signcolumn=yes
-    " if exists('+tagfunc') | setlocal tagfunc=lsp#tagfunc | endif
-    " nmap <buffer> gd <plug>(lsp-definition)
-    " nmap <buffer> gs <plug>(lsp-document-symbol-search)
-    " nmap <buffer> gS <plug>(lsp-workspace-symbol-search)
-    " nmap <buffer> gr <plug>(lsp-references)
-    " nmap <buffer> gi <plug>(lsp-implementation)
-    " nmap <buffer> gt <plug>(lsp-type-definition)
-    " nmap <buffer> <leader>rn <plug>(lsp-rename)
-    " nmap <buffer> [g <plug>(lsp-previous-diagnostic)
-    " nmap <buffer> ]g <plug>(lsp-next-diagnostic)
-    " nmap <buffer> K <plug>(lsp-hover)
-    " inoremap <buffer> <expr><c-f> lsp#scroll(+4)
-    " inoremap <buffer> <expr><c-d> lsp#scroll(-4)
-    let g:lsp_fold_enabled = 0
-    let g:lsp_document_highlight_enabled = 0
-    let g:lsp_diagnostics_enabled = 0
-    let g:lsp_format_sync_timeout = 200
-    " autocmd! BufWritePre *.rs,*.go call execute('LspDocumentFormatSync')
-    
-    " refer to doc to add more commands
-endfunction
-
-let g:lsp_fold_enabled = 0
-let g:lsp_document_highlight_enabled = 0
-let g:lsp_diagnostics_enabled = 0
-let g:lsp_format_sync_timeout = 200
-
 
 "################################################
 " YouCompleteMe setup
@@ -1509,24 +1505,15 @@ set formatoptions+=j " Delete comment character when joining commented lines
 " 7 or f: Find this file
 " 8 or i: Find files #including this file
 " cscope
-let g:csPath=""
+"argument (options) is number
 function! Cscope(option, query)
-  let color = '{ x = $1; $1 = ""; z = $3; $3 = ""; printf "\033[34m%s\033[0m:\033[31m%s\033[0m\011\033[37m%s\033[0m\n", x,z,$0; }'
-  " let l:path = expand('%:p:h')
-  " let l:path = substitute(l:path,'vobs.*','','')
-  " let l:cspath = l:path . "/vobs/cscope.files"
-  echom "query " . a:query
-  echom "path " . g:csPath
-  echom "option " . a:option
-  echom "path " . g:csPath
   let opts = {
-  \ 'source':  "cscope -d -f " . g:csPath . " " . " -L " . "-" . a:option . " " . a:query . " | awk '" . color . "'",
+  \ 'source':  "cscope -d -f " . g:csPath . " " . " -L" . a:option . " " . a:query,
   \ 'options': ['--ansi', '--prompt', '> ',
   \             '--multi', '--bind', 'alt-a:select-all,alt-d:deselect-all',
   \             '--color', 'fg:188,fg+:222,bg+:#3a3a3a,hl+:104'],
   \ 'down': '40%'
   \ }
-  echom "opts " . l:opts
   " function! opts.sink(lines)
     " let data = split(a:lines)
     " let file = split(data[0], ":")
@@ -1624,3 +1611,21 @@ let g:ycm_filetype_whitelist = {
 
 
 " call FuzzyBrowse("/home/pc/")
+let s:hidden_all = 0
+function! ToggleHiddenAll()
+    if s:hidden_all  == 0
+        let s:hidden_all = 1
+        " set noshowmode
+        " set noruler
+        set laststatus=0
+        " set noshowcmd
+    else
+        let s:hidden_all = 0
+        " set showmode
+        " set ruler
+        set laststatus=2
+        " set showcmd
+    endif
+endfunction
+
+nnoremap <S-h> :call ToggleHiddenAll()<CR>
