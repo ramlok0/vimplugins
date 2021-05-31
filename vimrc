@@ -5,7 +5,24 @@ endif
 let g:user_name = $USER
 " let g:lsp_cl="vimlsp"
 let g:lsp_cl="neocl"
+" set term=xterm-256color
 
+"fix alt arrow from terminal which is not xterm
+" if &term =~ "alacritty" || &term =~ "st"
+    " echom "APPLY FIX"
+    " execute "set <xUp>=\e[1;*A"
+    " execute "set <xDown>=\e[1;*B"
+    " execute "set <xRight>=\e[1;*C"
+    " execute "set <xLeft>=\e[1;*D"
+  " " map <ESC>[1;5A <C-Up>
+  " " map <ESC>[1;5B <C-Down>
+  " " map <ESC>[1;5C <C-Right>
+  " " map <ESC>[1;5D <C-Left>
+  " " imap <ESC>[1;5A <C-Up>
+  " " imap <ESC>[1;5B <C-Down>
+  " " imap <ESC>[1;5C <C-Right>
+  " " imap <ESC>[1;5D <C-Left>
+" endif
 
 set nocompatible
 filetype plugin on
@@ -47,7 +64,8 @@ Plug 'bignimbus/you-are-here.vim'
 " Plug 'Yilin-Yang/vim-markbar'
 Plug 'ojroques/vim-oscyank'
 Plug 'tomtom/tcomment_vim'
-Plug 'vim-scripts/YankRing.vim'
+"very slow on x deleting
+" Plug 'vim-scripts/YankRing.vim'
 Plug 'junegunn/fzf', { 'dir': '~/.fzf', 'do': './install --all' }
 Plug 'junegunn/fzf.vim'
 Plug 'pbogut/fzf-mru.vim'
@@ -206,9 +224,7 @@ function! EnsureDirExists (dir)
     endif
   endif
 endfunction
-echom "LSP CL " . g:lsp_cl
 if ( g:lsp_cl == "neocl" )
-  echom "IF  CLIENT"
   let g:execMenu = {
     \ "LangServer Menu":           "call LanguageClient_contextMenu()",
     \ "LangServer Hover":          "call LanguageClient#textDocument_hover()",
@@ -245,7 +261,6 @@ if ( g:lsp_cl == "neocl" )
     \ }
   endif
 else
-  echom "ELSE CLIENT"
   let g:execMenu = {
     \ "Lsp References":     "LspReferences",
     \ "Lsp Declaration":    "LspDeclaration",
@@ -745,7 +760,7 @@ nmap <F8> :TagbarToggle<CR>
 if ( g:lsp_cl == "neocl")
   nmap <F9> :call LanguageClient#textDocument_hover()<CR>
   nnoremap <silent>,hh :call LanguageClient#textDocument_hover()<CR>
-  nnoremap <silent>,hh :call LanguageClient#textDocument_references()<CR>
+  nnoremap <silent>,rr :call LanguageClient#textDocument_references()<CR>
 else
   nmap <F9> :LspHover<CR>
   nnoremap <silent>,hh :LspHover<CR>
@@ -754,7 +769,7 @@ endif
 nnoremap <silent>,bb :call FuzzyBrowse()<CR>
 nmap <silent>,hj <plug>(YCMHover)
 nmap <F10> :YRShow<CR>
-nnoremap <silent> ,yy :YRShow<CR>
+nnoremap <silent> ,yy :Clap yanks<CR>
 " noremap <silent><F11> :call quickmenu#toggle(0)<cr>
 noremap <silent><F11> :call ShowExecMenu()<cr>
 nnoremap <silent>,mm :call ShowExecMenu()<cr>
@@ -810,24 +825,79 @@ nnoremap <silent> ,nn :enew<CR>
 nnoremap <silent> ,ne :enew<CR>
 
 
-" nnoremap <silent> ,ld :LspDefinition<CR>
-" nnoremap <silent> ,lh :LspHover<CR>
-" nnoremap <silent> ,ls :LspReferences<CR>
-" nnoremap <silent> ,lc :LspCqueryCallers<CR>
 " rename files from quicfix window
 nnoremap <silent> ,qr :call QfToRename()<CR>
-nnoremap <silent> ,qf :CodeQueryFilter !  
+nnoremap <silent> ,qf :call QFFilter("")
 
-" nnoremap <silent> ,lh call LanguageClient#textDocument_hover()<CR>
+function! QFFilter(args) abort
+    if &filetype !=# 'qf'
+      echom " not a qf window"
+      copen
+    endif
+    let args = split(a:args, ' ')
+    if len(args) > 1
+        let query = args[1]
+        let reverse_filter = 1
+    else
+        let query = args[0]
+        let reverse_filter = 0
+    endif
+    echom query
+
+    let results = getqflist()
+    for d in results
+        if reverse_filter
+            if bufname(d['bufnr']) =~ query || d['text'] =~ query
+                call remove(results, index(results, d))
+            endif
+        else
+            if bufname(d['bufnr']) !~ query && d['text'] !~ query
+                call remove(results, index(results, d))
+            endif
+        endif
+    endfor
+    call setqflist(results)
+    call QFPrettify(results)
+endfunction
+
+function QFPrettify(results) abort
+    " unlock qf to make changes
+    setlocal modifiable
+    setlocal nolist
+    setlocal nowrap
+
+    " delete all the text in qf
+    silent %delete
+
+    " insert new text with pretty layout
+    let max_fn_len = 0
+    let max_lnum_len = 0
+    for d in a:results
+        let d['filename'] = bufname(d['bufnr'])
+        let max_fn_len = max([max_fn_len, len(d['filename'])])
+        let max_lnum_len = max([max_lnum_len, len(d['lnum'])])
+    endfor
+    let reasonable_max_len = 60
+    let max_fn_len = min([max_fn_len, reasonable_max_len])
+    let qf_format = '"%-' . max_fn_len . 'S | %' . max_lnum_len . 'S | %s"'
+    let evaluating_str = 'printf(' . qf_format .
+                    \ ', v:val["filename"], v:val["lnum"], v:val["text"])'
+    call append('0', map(a:results, evaluating_str))
+
+    " delete empty line
+    global/^$/delete
+
+    " put the cursor back
+    normal! gg
+
+    " lock qf again
+    setlocal nomodifiable
+    setlocal nomodified
+endfunction
+
 " nnoremap <silent> ,lh call LanguageClient#findLocations({'method':'$ccls/call'})<CR>
 
 
-" nnoremap <silent> ,cs :CodeQuery Symbol<CR>
-" nnoremap <silent> ,cc :CodeQuery Call<CR>
-" nnoremap <silent> ,cd :CodeQuery Definition<CR>
-"nnoremap <silent> ,cc :call ToggleComment()<CR>
-"vnoremap <silent> ,cu :call ToggleComment()<CR>
-" noremap  <silent> ,cc :call ToggleComment()<CR>
 noremap  <silent> ,cx :call DoToggleComment()<CR>
 noremap  <silent> ,cv :call UnToggleComment()<CR>
 " :c-r c-w = paste
@@ -1210,12 +1280,21 @@ let g:ycm_min_num_of_chars_for_completion = 3
 let g:ycm_auto_trigger = 1
 " You can use built-in profiling support: after launching vim do
 " 
-" :profile start profile.log
-" :profile func *
-" :profile file *
-" " At this point do slow actions
-" :profile pause
-" :noautocmd qall!
+let g:profileStatus=""
+function! ProfileToggle()
+  if ( empty(g:profileStatus) )
+    let g:profileStatus="r"
+    echom "profiling start"
+    execute "profile start rfile.log"
+    execute "profile func *"
+    execute "profile file *"
+  else
+    let g:profileStatus=""
+    echom "profiling stop"
+    execute "profile pause"
+    " exec "noautocmd qall!"
+  endif
+endfunction
 " @subjectego :set more | verbose function {function_name} will show you function contents and where it is located.
 
 "make cursor move visible?
@@ -1566,21 +1645,34 @@ let g:clap_selected_sign={ 'text': ' >', 'texthl': "WarningMsg", "linehl": "Clap
 
 " let g:yankB = []
 " "capture yank and other events
-" function! Tttt()
-  " echom "yank was done " . @"
+" function! CollectYanks()
+  " " echom "yank was done " . @"
   " let l:dd = @"
-  " " let g:yankB.append(l:dd)
-  " call add( g:yankB, @" )
+  " if g:yankB[-1] == l:dd
+	" return
+  " endif
+  " call add( g:yankB, l:dd )
+  " if len(g:yankB) > 50
+    " let g:yankB = g:yankB[25:]
+  " endif
 " endfunction
 " 
-" augroup highlight_yank
+" augroup collectYank
 " autocmd!
-" autocmd TextYankPost * call Tttt()
+" autocmd TextYankPost * call CollectYanks()
 " augroup END
- " 
-" :call fzf#run({'source': g:yankB}) 
+" 
+" function CollectYankPaste(data)
+  " if ! empty(a:data)
+    " let @z=a:data
+    " norm "zp
+  " endif
+" endfunction
+" " :call fzf#run({'source': g:yankB}) 
+" nnoremap <silent>,yy :call fzf#run({'source': g:yankB, 'sink': function('CollectYankPaste'), 'down': '30%', 'options':['--no-sort']})<CR>
+" nnoremap <silent>,yy :call fzf#run({'source': g:yankB, 'sink': function('CollectYankPaste'), 'down': '30%', 'options':['--no-sort']})<CR>
 
-
+  " call fzf#run({'source':keys(g:execMenu), 'down': '30%', 'sink': function('ExecMenuSelection'), 'options':['--no-sort']})
 "KITTY colors
 set termguicolors
 let &t_8f = "\e[38;2;%lu;%lu;%lum"

@@ -1,0 +1,12 @@
+%compile_commands.json
+%clang
+-Wall
+-Wextra
+%c -std=gnu11
+%cpp -pedantic
+%cpp -std=c++17
+%c %cpp -pthread
+%h %hpp --include=Global.h
+#--target=armv7a-linux-gnueabi
+-Iinc
+-DMACRO
